@@ -353,8 +353,18 @@
       adjust = Math.min(aTarget, nonBasicRemain); nonBasicRemain -= adjust;
     }
 
-    // 基本給＝残り（BASIC_MINは自動的に確保される設計）
-    const basic = monthly - (qual + duty + proc2 + adjust + commute + car);
+        // 基本給＝最低保証額確保
+    let basic = BASIC_MIN;
+    let basic_over = 0;
+
+    // 今まで通り計算した後に超過分を職務へ
+    const temp_basic = monthly - (qual + duty + proc2 + adjust + commute + car);
+    if (temp_basic > BASIC_MIN) {
+      basic_over = temp_basic - BASIC_MIN;
+      duty += basic_over;
+    } else {
+      basic = temp_basic;
+    }
 
     // 表示
     bkBasic.textContent   = yen(basic);
@@ -365,6 +375,7 @@
     bkCommute.textContent = yen(commute);
     bkCar.textContent     = yen(car);
     bkTotal.textContent   = yen(monthly);
+
 
     dutyOT.textContent  = yen(duty_ot);
     dutyHD.textContent  = yen(duty_hd);
