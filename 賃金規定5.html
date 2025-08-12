@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>正規雇用の条件・賃金算定＆内訳配分（しもごおり山の手保育園）</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="正規職員の労働条件。時給モデル→月額→基本給と各手当（資格・職務・処遇Ⅱ・調整）に自動配分。固定シフトは最低条件、上限拡大同意で恩恵あり。">
+<style>
+  :root{--w:980px;--line:#ddd;--fg:#222;--muted:#666;--brand:#0b6}
+  html,body{margin:0;padding:0;background:#fafafa;color:var(--fg);font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans JP","Hiragino Kaku Gothic ProN",Meiryo,sans-serif;line-height:1.7}
+  main{max-width:var(--w);margin:auto;background:#fff;padding:28px;border-radius:14px;box-shadow:0 8px 20px rgba(0,0,0,.06)}
+  h1{margin:.2em 0 .4em;font-size:1.6rem}
+  h2{margin:1.2em 0 .4em;font-size:1.2rem;border-left:6px solid var(--brand);padding-left:10px}
+  h3{margin:1em 0 .2em;font-size:1.05rem}
+  p,li,label,select,input,button{font-size:1rem}
+  table{width:100%;border-collapse:collapse;margin:.6em 0}
+  th,td{border:1px solid var(--line);padding:.55em;text-align:left;vertical-align:top}
+  thead th,tfoot th{background:#f7f7f7}
+  .muted{color:var(--muted)}
+  .note{border-left:4px solid var(--brand);background:#f6fffa;padding:.6em .8em;margin:.8em 0;color:#053}
+  .calc{border:1px solid var(--line);border-radius:10px;padding:14px}
+  .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:.4em 0}
+  .num{font-variant-numeric:tabular-nums}
+  .result{font-size:1.2rem;font-weight:600}
+  .right{margin-left:auto}
+  footer{margin-top:28px;color:var(--muted);font-size:.95rem}
+  @page{size:A4;margin:18mm}
+  @media print{
+    body{background:#fff}
+    main{box-shadow:none;border-radius:0}
+  }
+
+  /* ■に✓ のチェックUI */
+  .checks{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+  .chk{display:flex;align-items:center;gap:8px}
+  .chk input[type="checkbox"]{
+    appearance:none;-webkit-appearance:none;width:1.15em;height:1.15em;
+    border:2px solid #999;border-radius:3px;display:inline-grid;place-content:center;background:#fff
+  }
+  .chk input[type="checkbox"]::after{
+    content:"";width:.7em;height:.7em;transform:scale(0);transition:120ms transform ease-in-out
+  }
+  .chk input[type="checkbox"]:checked{border-color:#0b6;background:#0b6;color:#fff}
+  .chk input[type="checkbox"]:checked::after{content:"✓";transform:scale(1);font-size:.9em;line-height:1;color:#fff}
+  .mini{font-size:.92em;color:#555}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>正規雇用の条件・賃金算定＆内訳配分（最新版）</h1>
+    <p class="muted">しもごおり山の手保育園｜最終更新：<time id="last-updated">—</time></p>
+  </header>
+
+  <section>
+    <h2>1) 労働時間の最低条件と方針</h2>
+    <ul>
+      <li>1日最低労働時間：<strong>8時間</strong></li>
+      <li>週の勤務日：<strong>月～土のうち5日</strong>（最低条件）</li>
+      <li>所定労働時間（月）：<strong>平均 173.5h</strong>／<strong>31日月 177h</strong>／<strong>30日月 171h</strong></li>
+    </ul>
+    <h3>固定シフト（A/B/C）<span class="muted">＝最低条件（上限加算なし）</span></h3>
+    <ul>
+      <li>A：1日8h（休憩60分）｜年間休日107日（8～9日/月）</li>
+      <li>B：1日8.5h（休憩60–90分）｜年間休日120日（10日/月）</li>
+      <li>C：1日9h（休憩90分）｜年間休日132日（11日/月）</li>
+    </ul>
+    <div class="note">
+      固定シフト（A/B/C）は<strong>最低条件</strong>とみなし、上限拡大加算は適用しません。<br>
+      上限拡大に同意し、シフト作成において最大<strong>9/10/11時間</strong>まで割当可能な場合、運営協力への恩恵として<strong>基本時給</strong>を上限別に引き上げます。
+    </div>
+    <div class="note">
+      <strong>勤務時間の調整ルール：</strong>1日<strong>11時間勤務</strong>を行った場合は、週平均の所定労働時間を超過しないよう、他日の<strong>8時間を超える部分を相殺</strong>する短縮調整を行います。<br>
+      この調整は<strong>8時間超の勤務日がある場合に限り適用</strong>し、短縮日の勤務は<strong>最低6時間</strong>を下回らないものとします。
+    </div>
+  </section>
+
+  <section>
+    <h2>2) 加算の軸（上限・時間帯・曜日・六連続）</h2>
+    <table>
+      <thead><tr><th>軸</th><th>内容</th><th>基準・加算</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>上限拡大</td>
+          <td>1日の割当上限に同意（固定シフトは対象外）</td>
+          <td class="num">9h：¥1,150／10h：¥1,200／11h：¥1,250（基本時給）</td>
+        </tr>
+        <tr>
+          <td>時間帯対応</td>
+          <td>7:00～／～20:00／7:00～20:00</td>
+          <td class="num">＋¥50／＋¥50／＋¥100（時給上乗せ）</td>
+        </tr>
+        <tr>
+          <td>曜日対応</td>
+          <td>月～日すべて対応</td>
+          <td class="num">＋¥50（時給上乗せ）</td>
+        </tr>
+        <tr>
+          <td>六連続勤務</td>
+          <td>同意者のみ恒常加算（職務手当に内包）</td>
+          <td class="num">＋¥50（時給上乗せ）</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="muted">※ 時間帯加算・曜日加算は「処遇改善手当Ⅱ」に集約（研修受講者）。時間外・休日・六連続の加算は「職務手当」に内包。</p>
+  </section>
+
+  <section id="calc-sec">
+    <h2>3) 時給→月額の自動計算（モデル）＋内訳配分</h2>
+    <div class="calc" id="calc">
+      <div class="row">
+        <label><input type="radio" name="mode" value="fixed" checked> 固定シフト（A/B/C：最低条件／上限加算なし）</label>
+        <label><input type="radio" name="mode" value="expand"> 上限拡大に同意（9/10/11時間まで割当可）</label>
+      </div>
+
+      <div class="row" id="fixedBlock">
+        <label for="fixed">固定シフト：</label>
+        <select id="fixed">
+          <option value="A">A：1日8h（休憩60分）｜年休107</option>
+          <option value="B">B：1日8.5h（休憩60–90）｜年休120</option>
+          <option value="C">C：1日9h（休憩90）｜年休132</option>
+        </select>
+        <span class="muted">※最低条件ベース時給（¥1,100換算）で試算</span>
+      </div>
+
+      <div class="row" id="expandBlock" style="display:none">
+        <label for="cap">一日の上限：</label>
+        <select id="cap">
+          <option value="9">9時間上限（¥1,150）</option>
+          <option value="10">10時間上限（¥1,200）</option>
+          <option value="11">11時間上限（¥1,250）</option>
+        </select>
+        <span class="muted">※上限拡大に協力の恩恵として基本時給UP</span>
+      </div>
+
+      <div class="row">
+        <label for="band">時間帯対応：</label>
+        <select id="band">
+          <option value="50">7:00～対応（＋¥50）</option>
+          <option value="50e">～20:00対応（＋¥50）</option>
+          <option value="100">7:00～20:00対応（＋¥100）</option>
+        </select>
+      </div>
+
+      <fieldset style="border:1px solid #ddd;border-radius:8px;padding:10px">
+        <legend style="padding:0 6px">チェック項目</legend>
+        <div class="checks">
+          <label class="chk"><input type="checkbox" id="wkAll"> 月～日すべて対応（＋¥50/時）</label>
+          <label class="chk"><input type="checkbox" id="sixConsent"> 六連続勤務に同意（＋¥50/時）</label>
+          <label class="chk"><input type="checkbox" id="otChange"> 時間外手当（提出後の時間帯変更の約束）＋¥50/時</label>
+          <label class="chk"><input type="checkbox" id="hdChange"> 休日出勤手当（提出後の休日変更の約束）＋¥100/時</label>
+        </div>
+      </fieldset>
+
+      <div class="row" style="margin-top:.5em">
+        <label for="month">月の区分：</label>
+        <select id="month">
+          <option value="173.5">平均月（173.5h）</option>
+          <option value="177">31日月（177h）</option>
+          <option value="171">30日月（171h）</option>
+        </select>
+        <label class="right"><input type="checkbox" id="trained" checked> 研修受講（処遇改善手当Ⅱの対象）</label>
+      </div>
+
+      <hr>
+
+      <div class="row result">
+        <div>時給（モデル）：<span id="hourly" class="num">¥—</span></div>
+        <div class="right">月額（時給×所定時間）参考：<span id="monthlyRaw" class="num">¥—</span></div>
+      </div>
+
+      <h3>内訳への自動配分（モデル）</h3>
+      <table id="breakdown">
+        <thead>
+          <tr><th>項目</th><th>金額</th><th>備考</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>基本給</td><td id="bk-basic" class="num">¥181,000</td><td>最低額（下限）</td></tr>
+          <tr><td>【一律】資格手当</td><td id="bk-qual" class="num">¥15,000</td><td>優先1：固定で付与</td></tr>
+          <tr>
+            <td>【一律】職務手当</td>
+            <td id="bk-duty" class="num">¥0</td>
+            <td>
+              10,000〜<strong>30,000</strong>：<span class="muted">処遇Ⅱが付かない場合は優先配分／時間外・休日・六連続の加算を内包</span>
+              <div class="mini">内訳：時間外 <span id="duty-ot" class="num">¥0</span> ／ 休日 <span id="duty-hd" class="num">¥0</span> ／ 六連続 <span id="duty-six" class="num">¥0</span></div>
+            </td>
+          </tr>
+          <tr><td>処遇改善手当Ⅱ</td><td id="bk-proc2" class="num">¥0</td><td><strong>0</strong>〜40,000：<span class="muted">時間帯＋曜日加算を集約（研修受講者）</span></td></tr>
+          <tr><td>調整手当</td><td id="bk-adjust" class="num">¥0</td><td><strong>0</strong>〜40,000：<span class="muted">職務手当の上限（30,000円）超過分がある場合のみ配分</span></td></tr>
+        </tbody>
+        <tfoot>
+          <tr><th>総支給（モデル）</th><th id="bk-total" class="num">¥—</th><th></th></tr>
+        </tfoot>
+      </table>
+
+      <p class="muted">
+        ※ 配分ルール：①資格15,000固定 → ②研修受講者は時間帯＋曜日を処遇Ⅱ（<strong>0〜40k</strong>）へ集約／未受講は職務（10〜<strong>30k</strong>）で優先 →
+        ③ 職務で吸収しきれない上限超過分のみ調整手当（<strong>0〜40k</strong>）へ。<br>
+        ※ 時間外・休日・六連続は職務手当に<strong>内包</strong>（内訳表示あり）。基本給は181,000円を下限確保。
+      </p>
+    </div>
+  </section>
+
+  <footer>
+    <p>© Shimoori Yamanote Nursery. 作成：小粟李（署名は必要に応じ変更可）</p>
+  </footer>
+</main>
+
+<script>
+(function(){
+  // 日付
+  try{
+    const tz='Asia/Tokyo', d=new Date();
+    const fmt=new Intl.DateTimeFormat('ja-JP',{timeZone:tz,year:'numeric',month:'2-digit',day:'2-digit'});
+    document.getElementById('last-updated').textContent=fmt.format(d);
+  }catch(e){}
+
+  // 基本設定
+  const baseHourlyExpand = {9:1150, 10:1200, 11:1250}; // 上限拡大の基本時給
+  const baseHourlyFixed  = 1100;                        // 固定シフトは最低条件ベース
+  const sixDayAdd        = 50;                          // 六連続（同意時）
+  const QUAL = 15000, BASIC_MIN = 181000;
+  const PROC2_MIN=0, PROC2_MAX=40000;                   // 下限撤廃
+  const DUTY_MIN=10000,  DUTY_MAX=30000;                // 上限を30,000へ
+  const ADJ_MIN =0,      ADJ_MAX =40000;                // 下限撤廃
+
+  // UI
+  const modeRadios = [...document.querySelectorAll('input[name="mode"]')];
+  const fixedBlock = document.getElementById('fixedBlock');
+  const expandBlock= document.getElementById('expandBlock');
+  const capSel     = document.getElementById('cap');
+  const bandSel    = document.getElementById('band');
+  const wkAll      = document.getElementById('wkAll');
+  const sixConsent = document.getElementById('sixConsent');
+  const otChange   = document.getElementById('otChange');
+  const hdChange   = document.getElementById('hdChange');
+  const monSel     = document.getElementById('month');
+  const trained    = document.getElementById('trained');
+  const hourlyOut  = document.getElementById('hourly');
+  const monthlyRaw = document.getElementById('monthlyRaw');
+
+  // breakdown
+  const bkBasic  = document.getElementById('bk-basic');
+  const bkQual   = document.getElementById('bk-qual');
+  const bkDuty   = document.getElementById('bk-duty');
+  const bkProc2  = document.getElementById('bk-proc2');
+  const bkAdjust = document.getElementById('bk-adjust');
+  const bkTotal  = document.getElementById('bk-total');
+  const dutyOT   = document.getElementById('duty-ot');
+  const dutyHD   = document.getElementById('duty-hd');
+  const dutySix  = document.getElementById('duty-six');
+
+  const yen = n => '¥' + Math.round(n).toLocaleString('ja-JP');
+  const getMode = () => modeRadios.find(r=>r.checked).value;
+  const toggleBlocks = () => {
+    const m=getMode();
+    fixedBlock.style.display  = (m==='fixed')  ? '' : 'none';
+    expandBlock.style.display = (m==='expand') ? '' : 'none';
+  };
+
+  function calc(){
+    const m      = getMode();
+    const hours  = parseFloat(monSel.value);
+    const base   = (m==='expand') ? baseHourlyExpand[capSel.value] : baseHourlyFixed;
+
+    // 時給加算（選択）
+    const bandAdd = (bandSel.value==='100') ? 100 : 50;
+    const weekAdd = wkAll.checked ? 50 : 0;
+    const sixAdd  = sixConsent.checked ? sixDayAdd : 0; // 職務へ内包
+    const otAdd   = otChange.checked ? 50 : 0;          // 職務へ内包
+    const hdAdd   = hdChange.checked ? 100: 0;          // 職務へ内包
+
+    // 時給・月額
+    const hourly = base + bandAdd + weekAdd + sixAdd + otAdd + hdAdd;
+    hourlyOut.textContent = yen(hourly);
+    const monthly = hourly * hours;
+    monthlyRaw.textContent = yen(monthly);
+
+    // —— 内訳配分 ——
+    const basic = BASIC_MIN, qual = QUAL;
+
+    // 金額化
+    const amt_band_week = (bandAdd + weekAdd) * hours; // → 処遇Ⅱ（受講者）or 職務（未受講）
+    const amt_six       = sixAdd * hours;              // → 職務内包
+    const amt_ot        = otAdd * hours;               // → 職務内包
+    const amt_hd        = hdAdd * hours;               // → 職務内包
+    const duty_pool_only = amt_ot + amt_hd + amt_six;  // 職務に入れるプール
+    const pool_with_bw   = duty_pool_only + amt_band_week;
+
+    let proc2=0, duty=0, adjust=0;
+
+    if(trained.checked){
+      // 受講者：band/weekは処遇Ⅱ（0〜40k）へ
+      proc2 = Math.max(PROC2_MIN, Math.min(PROC2_MAX, amt_band_week));
+      // 職務：時間外・休日・六連続のみ（10〜30kにクランプ、0のときは0）
+      if(duty_pool_only > 0){
+        duty = Math.max(DUTY_MIN, Math.min(DUTY_MAX, duty_pool_only));
+        const residual = duty_pool_only - duty;
+        // 職務上限超過（約束＋六連続の余剰）があれば調整手当へ（0〜40k）
+        if(residual > 0){
+          adjust = Math.max(ADJ_MIN, Math.min(ADJ_MAX, residual));
+        }
+      }else{
+        duty = 0;
+        adjust = 0;
+      }
+    }else{
+      // 未受講：band/weekも含めて職務で優先吸収（10〜30k、0のときは0）
+      if(pool_with_bw > 0){
+        duty = Math.max(DUTY_MIN, Math.min(DUTY_MAX, pool_with_bw));
+        const residual = pool_with_bw - duty;
+        if(residual > 0){
+          adjust = Math.max(ADJ_MIN, Math.min(ADJ_MAX, residual)); // 職務上限超過分のみ
+        }
+      }else{
+        duty = 0;
+        adjust = 0;
+      }
+    }
+
+    // 総支給（モデル）
+    const total = basic + qual + duty + proc2 + adjust;
+
+    // 表示
+    bkBasic.textContent  = yen(basic);
+    bkQual.textContent   = yen(qual);
+    bkDuty.textContent   = yen(duty);
+    bkProc2.textContent  = yen(proc2);
+    bkAdjust.textContent = yen(adjust);
+    bkTotal.textContent  = yen(total);
+
+    dutyOT.textContent  = yen(amt_ot);
+    dutyHD.textContent  = yen(amt_hd);
+    dutySix.textContent = yen(amt_six);
+  }
+
+  // 監視
+  modeRadios.forEach(r=>r.addEventListener('change',()=>{toggleBlocks();calc();}));
+  [capSel, bandSel, wkAll, sixConsent, otChange, hdChange, monSel, trained].forEach(el=>el.addEventListener('change', calc));
+
+  toggleBlocks(); calc();
+})();
+</script>
+</body>
+</html>
