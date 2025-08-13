@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>非常勤スタッフ 賃金シミュレーター｜しもごおり山の手保育園</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="非常勤（パート・アルバイト）向け。週の勤務パターンと加算を選ぶと、時給・見込み月額を自動計算。経験者加算の縮小係数、クラス運営加算、各種手当に対応。">
+<style>
+  :root{--w:1080px;--line:#e8e8e8;--fg:#222;--muted:#666;--brand:#0b6;--bg:#fafafa}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans JP","Hiragino Kaku Gothic ProN",Meiryo,sans-serif;line-height:1.7}
+  header.hero{background:#fff;border-bottom:1px solid var(--line)}
+  .wrap{max-width:var(--w);margin:auto;padding:28px}
+  h1{margin:.1em 0 .2em;font-size:1.9rem}
+  h2{margin:1.4em 0 .6em;font-size:1.25rem;border-left:6px solid var(--brand);padding-left:10px}
+  h3{margin:1em 0 .3em;font-size:1.05rem}
+  .muted{color:var(--muted)}
+  .pill{display:inline-block;padding:.25em .6em;border-radius:999px;background:#eafaf2;color:#064}
+  .calc{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;box-shadow:0 6px 16px rgba(0,0,0,.04)}
+  .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:.5em 0}
+  .checks{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+  .chk{display:flex;align-items:center;gap:8px}
+  .num{font-variant-numeric:tabular-nums}
+  table{width:100%;border-collapse:collapse;margin:.6em 0}
+  th,td{border:1px solid var(--line);padding:.55em;text-align:left;vertical-align:top}
+  thead th,tfoot th{background:#f7f7f7}
+  .result{font-size:1.2rem;font-weight:600}
+  footer{margin:36px auto 28px;color:var(--muted);font-size:.95rem;text-align:center}
+  .right{margin-left:auto}
+  .small{font-size:.92em}
+  select, input[type="number"]{padding:.35em .5em}
+  .hint{margin:.25em 0 .2em;color:#555;font-size:.92em}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="wrap">
+    <span class="pill">しもごおり山の手保育園</span>
+    <h1>非常勤スタッフ 賃金シミュレーター</h1>
+    <p class="muted">週の勤務パターンと各加算を選ぶだけ。見込み時給／月額を自動試算します。最終更新：<time id="last-updated">—</time></p>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ① 週の勤務パターン -->
+  <section>
+    <h2>① 週の勤務パターン</h2>
+    <div class="calc">
+      <div class="row">
+        <label for="pattern">週の予定勤務：</label>
+        <select id="pattern">
+          <option value="u20">20時間未満（雇用保険未加入）</option>
+          <option value="u30">30時間未満（扶養の範囲内）</option>
+          <option value="u40">40時間未満（社会保険加入）</option>
+          <option value="f40">40時間（フルパート）</option>
+        </select>
+      </div>
+      <div class="row" style="align-items:flex-end;">
+        <div>
+          <label for="weekHours">実際の週時間（自由入力）</label><br>
+          <input id="weekHours" type="number" min="1" max="40" step="0.5" value="15" style="width:140px"> h
+          <div class="hint">※ 見込み月間時間は <strong>週時間 × 4.333</strong> で自動計算</div>
+        </div>
+        <div class="right">
+          <span class="muted">見込み月間時間：</span>
+          <strong id="monthlyHours" class="num">—</strong> h
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ② 標準労働時間・開始/終了 -->
+  <section>
+    <h2>② 勤務時間の希望</h2>
+    <div class="calc">
+      <div class="row">
+        <label for="stdDayHours">1日の標準労働時間：</label>
+        <select id="stdDayHours">
+          <option value="3">3時間</option>
+          <option value="4">4時間</option>
+          <option value="5">5時間</option>
+          <option value="6">6時間</option>
+          <option value="7">7時間</option>
+          <option value="8" selected>8時間</option>
+        </select>
+        <span class="muted small">（情報表示のみ。賃金計算への直接影響はありません）</span>
+      </div>
+
+      <div class="row">
+       <label for="startPref">開始時刻の希望：</label>
+<select id="startPref">
+  <option value="0">9:00～（＋¥0）</option> 
+  <option value="25">7:00〜（＋¥25）</option>
+  <option value="20">7:30〜（＋¥20）</option>
+  <option value="15">8:00〜（＋¥15）</option>
+  <option value="10">8:30〜（＋¥10）</option>
+</select>
+
+<label class="right" for="endPref">終了時刻の希望：</label>
+<select id="endPref">
+  <option value="0">～16:00（＋¥0）</option> 
+  <option value="10">〜17:00（＋¥10）</option>
+  <option value="15">〜18:00（＋¥15）</option>
+  <option value="20">〜19:00（＋¥20）</option>
+  <option value="25">〜20:00（＋¥25）</option>
+</select>
+
+      </div>
+      <p class="muted small">※ 「時間帯対応」は廃止しました。開始・終了のどちらか/両方を選択できます（重複想定OK）。</p>
+    </div>
+  </section>
+
+  <!-- ③ クラス運営加算（見やすく整理） -->
+  <section>
+    <h2>③ クラス運営の加算</h2>
+    <div class="calc">
+      <div class="checks">
+        <label class="chk">
+          <input type="checkbox" id="cls_note_reflect">
+          連絡帳記入・週案の反省（＋¥20）
+          <span class="muted small">— 対象：30h未満／40h未満</span>
+        </label>
+        <label class="chk">
+          <input type="checkbox" id="cls_week_mgmt">
+          週案管理（＋¥15）
+          <span class="muted small">— 対象：40h未満</span>
+        </label>
+        <label class="chk">
+          <input type="checkbox" id="cls_individual">
+          個別記録管理（＋¥15）
+          <span class="muted small">— 対象：30h未満／40h未満</span>
+        </label>
+        <label class="chk">
+          <input type="checkbox" id="cls_parent">
+          保護者対応（＋¥20）
+          <span class="muted small">— 対象：40h未満のみ</span>
+        </label>
+      </div>
+    </div>
+  </section>
+
+  <!-- ④ 経験者加算（縮小係数は従来通り） -->
+  <section>
+    <h2>④ 保育施設 経験者加算</h2>
+    <div class="calc">
+      <div class="checks">
+        <label><input type="radio" name="exp" value="0" checked> 該当なし</label>
+        <label><input type="radio" name="exp" value="50"> 入職〜5年未満（＋¥50/時）</label>
+        <label><input type="radio" name="exp" value="100"> 5〜10年未満（＋¥100/時）</label>
+        <label><input type="radio" name="exp" value="150"> 10〜20年（＋¥150/時）</label>
+        <label><input type="radio" name="exp" value="200"> 20〜30年（＋¥200/時）</label>
+      </div>
+      <p class="muted small">
+        縮小係数：<b>20h未満＝×0.25／30h未満＝×0.5／40h未満＝×0.75／フル＝×1.00</b>（小数点は切り捨て）。<br>
+        ※ 経験者加算は<strong>時給に加算</strong>し、内訳では<strong>基本給（時給部分）</strong>にのみ算入します。
+      </p>
+    </div>
+  </section>
+
+  <!-- ⑤ 新設：各種手当（正規と同様） -->
+  <section>
+    <h2>⑤ その他の手当（正規職員と同様ルール）</h2>
+    <div class="calc">
+      <div class="checks">
+        <label class="chk"><input type="checkbox" id="allWeek"> 月～日すべて対応（＋¥50/時）</label>
+        <label class="chk"><input type="checkbox" id="sixConsent"> 6連続勤務に同意（＋¥10/時）</label>
+        <label class="chk"><input type="checkbox" id="shiftFlex"> シフト融通手当（提出後の時間帯変更の約束）＋¥20/時</label>
+        <label class="chk"><input type="checkbox" id="holidaySub"> 休日振替手当（提出後の休日変更の約束）＋¥50/時</label>
+      </div>
+    </div>
+  </section>
+
+  <!-- 結果 -->
+  <section>
+    <h2>結果</h2>
+    <div class="calc">
+      <div class="row result">
+        <div>時給（モデル）：<span id="hourly" class="num">¥—</span></div>
+        <div class="right">見込み月額：<span id="monthlyRaw" class="num">¥—</span></div>
+      </div>
+
+      <h3>内訳（非常勤・見込み）</h3>
+      <table>
+        <thead><tr><th>項目</th><th>金額</th><th>備考</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>基本給（時給×月間時間）</td>
+            <td id="bk-basic" class="num">¥0</td>
+            <td class="small">内訳：最低時給 ¥1,050 ＋ <span id="bk-exp-note">経験者加算 ¥0</span> × 月間時間（<span id="monthlyHours2">—</span>h）</td>
+          </tr>
+          <tr><td>交通費（月・任意）</td><td id="bk-commute" class="num">¥0</td>
+            <td><input id="commute" type="number" step="100" value="0" style="width:140px"> を加算</td></tr>
+        </tbody>
+        <tfoot>
+          <tr><th>総支給（見込み・月次）</th><th id="bk-total" class="num">¥—</th>
+            <th>＝ 基本給＋（開始/終了・クラス運営・各種手当の時給加算×月間時間）＋交通費</th></tr>
+        </tfoot>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    <p>© Shimoori Yamanote Nursery</p>
+  </footer>
+</main>
+
+<script>
+(function(){
+  // 日付
+  try{
+    const tz='Asia/Tokyo', d=new Date();
+    const fmt=new Intl.DateTimeFormat('ja-JP',{timeZone:tz,year:'numeric',month:'2-digit',day:'2-digit'});
+    document.getElementById('last-updated').textContent=fmt.format(d);
+  }catch(e){}
+
+  // 定数
+  const BASE_HOURLY = 1050; // 全パターンの起点
+  const HOURS_PER_WEEK_TO_MONTH = 4.333; // ≈52週/12ヶ月
+  const EXP_FACTOR = { u20:0.25, u30:0.5, u40:0.75, f40:1.0 };
+  const yen = n => '¥' + Math.floor(Math.max(0,n)).toLocaleString('ja-JP');
+
+  // 参照
+  const patternSel = document.getElementById('pattern');
+  const weekHours  = document.getElementById('weekHours');
+
+  const stdDayHours= document.getElementById('stdDayHours'); // 表示のみ
+  const startPref  = document.getElementById('startPref');   // 0 / 25
+  const endPref    = document.getElementById('endPref');     // 0 / 25
+
+  const cls_note_reflect = document.getElementById('cls_note_reflect'); // +20（u30/u40）
+  const cls_week_mgmt    = document.getElementById('cls_week_mgmt');    // +15（u40）
+  const cls_individual   = document.getElementById('cls_individual');   // +15（u30/u40）
+  const cls_parent       = document.getElementById('cls_parent');       // +20（u40のみ）
+
+  const expRadios = [...document.querySelectorAll('input[name="exp"]')];
+
+  const allWeek   = document.getElementById('allWeek');     // +50
+  const sixConsent= document.getElementById('sixConsent');  // +10
+  const shiftFlex = document.getElementById('shiftFlex');   // +20
+  const holidaySub= document.getElementById('holidaySub');  // +50
+
+  const commuteIn = document.getElementById('commute');
+
+  const hourlyOut = document.getElementById('hourly');
+  const monthlyOut= document.getElementById('monthlyRaw');
+  const monthlyHoursEl1 = document.getElementById('monthlyHours');
+  const monthlyHoursEl2 = document.getElementById('monthlyHours2');
+
+  const bkBasic = document.getElementById('bk-basic');
+  const bkTotal = document.getElementById('bk-total');
+  const bkCommute = document.getElementById('bk-commute');
+  const bkExpNote = document.getElementById('bk-exp-note');
+
+  function getMonthlyHours(){
+    return Math.max(0, Number(weekHours.value||0) * HOURS_PER_WEEK_TO_MONTH);
+  }
+
+  function getExpHourlyReduced(){
+    const r = expRadios.find(x=>x.checked);
+    const base = r ? parseInt(r.value,10) : 0; // 0/50/100/150/200
+    const factor = EXP_FACTOR[patternSel.value] || 1.0;
+    return Math.floor(base * factor); // 小数点以下切り捨て
+  }
+
+  function classDutyHourlyByPattern(){
+    const p = patternSel.value;
+    let h = 0;
+    const isU30 = (p==='u30');
+    const isU40 = (p==='u40');
+
+    if((isU30 || isU40) && cls_note_reflect.checked) h += 20; // 連絡帳・反省
+    if(isU40 && cls_week_mgmt.checked) h += 15;               // 週案管理
+    if((isU30 || isU40) && cls_individual.checked) h += 15;   // 個別記録管理
+    if(isU40 && cls_parent.checked) h += 20;                  // 保護者対応
+
+    return h;
+  }
+
+  function otherAdditionsHourly(){
+    let h = 0;
+    if(allWeek.checked)   h += 50;
+    if(sixConsent.checked)h += 10;
+    if(shiftFlex.checked) h += 20;
+    if(holidaySub.checked)h += 50;
+    return h;
+  }
+
+  function calc(){
+    const mh = getMonthlyHours();
+    const mhDisp = (Math.round(mh*100)/100).toLocaleString('ja-JP');
+    monthlyHoursEl1.textContent = mhDisp;
+    monthlyHoursEl2.textContent = mhDisp;
+
+    const base = BASE_HOURLY;
+    const expH = getExpHourlyReduced();
+
+    // 開始/終了の加算（時間帯対応は撤廃）
+    const startH = parseInt(startPref.value||'0',10); // 0 or 25
+    const endH   = parseInt(endPref.value||'0',10);   // 0 or 25
+
+    // クラス運営（パターン制約あり）
+    const clsH   = classDutyHourlyByPattern();
+
+    // 正規と同様の各種手当
+    const othH   = otherAdditionsHourly();
+
+    // ★時給（モデル）
+    const hourly = base + expH + startH + endH + clsH + othH;
+
+    // 見込み月額（総支給ベース）
+    const monthly = hourly * mh;
+
+    // 基本給（時給部分＝最低＋経験者縮小分）のみで構成
+    const basic = (base + expH) * mh;
+
+    // 交通費
+    const commute = Number(commuteIn.value||0);
+
+    // 総支給（= 基本給 +（開始/終了・クラス運営・その他手当の時給加算×月間時間）+ 交通費）
+    const total = basic + ((startH + endH + clsH + othH) * mh) + commute;
+
+    // 表示
+    hourlyOut.textContent = yen(hourly);
+    monthlyOut.textContent= yen(monthly);
+    bkBasic.textContent   = yen(basic);
+    bkCommute.textContent = yen(commute);
+    bkTotal.textContent   = yen(total);
+    bkExpNote.textContent = `経験者加算 ¥${expH.toLocaleString('ja-JP')}`;
+  }
+
+  // イベント
+  [
+    patternSel, weekHours, stdDayHours, startPref, endPref,
+    cls_note_reflect, cls_week_mgmt, cls_individual, cls_parent,
+    allWeek, sixConsent, shiftFlex, holidaySub,
+    commuteIn, ...expRadios
+  ].forEach(el=>el.addEventListener('change', calc));
+
+  // パターン変更時の週時間の目安
+  const defaultHours = {u20:15, u30:28, u40:36, f40:40};
+  patternSel.addEventListener('change', ()=>{
+    weekHours.value = defaultHours[patternSel.value] || 15;
+    calc();
+  });
+
+  // 初期表示
+  weekHours.value = defaultHours[patternSel.value];
+  calc();
+})();
+</script>
+</body>
+</html>
