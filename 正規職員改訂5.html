@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>正規職員の働き方 × 賃金シミュレーター｜しもごおり山の手保育園（改訂版 v3）</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="働き方（A/B/C・時間帯・曜日・6連続・経験者・クラス運営・シフト融通・休日振替）を選ぶと、173.5h固定の月給・内訳・年収を自動試算。賞与は基本給を算定基礎。上限時間を撤廃し、経験者加算は職務手当に配分（上限超過は調整手当へ）。">
+<style>
+  :root{--w:1080px;--line:#e8e8e8;--fg:#222;--muted:#666;--brand:#0b6;--bg:#fafafa}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans JP","Hiragino Kaku Gothic ProN",Meiryo,sans-serif;line-height:1.7}
+  header.hero{background:#fff;border-bottom:1px solid var(--line)}
+  .wrap{max-width:var(--w);margin:auto;padding:28px}
+  h1{margin:.1em 0 .2em;font-size:1.9rem}
+  h2{margin:1.4em 0 .5em;font-size:1.25rem;border-left:6px solid var(--brand);padding-left:10px}
+  h3{margin:1em 0 .3em;font-size:1.05rem}
+  .muted{color:var(--muted)}
+  .pill{display:inline-block;padding:.25em .6em;border-radius:999px;background:#eafaf2;color:#064}
+  .grid{display:grid;gap:14px}
+  .cards{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+  .card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;box-shadow:0 6px 16px rgba(0,0,0,.04)}
+  .card h4{margin:.2em 0 .4em;font-size:1.05rem}
+  .card button{display:inline-block;margin-top:8px;border:0;background:#0b6;color:#fff;padding:.5em .8em;border-radius:8px;cursor:pointer}
+  .calc{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;box-shadow:0 6px 16px rgba(0,0,0,.04)}
+  .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:.4em 0}
+  .checks{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+  .chk{display:flex;align-items:center;gap:8px}
+  .chk input[type="checkbox"], .checks input[type="radio"]{accent-color:#0b6}
+  table{width:100%;border-collapse:collapse;margin:.6em 0}
+  th,td{border:1px solid var(--line);padding:.55em;text-align:left;vertical-align:top}
+  thead th,tfoot th{background:#f7f7f7}
+  .num{font-variant-numeric:tabular-nums}
+  .result{font-size:1.2rem;font-weight:600}
+  footer{margin:36px auto 28px;color:var(--muted);font-size:.95rem;text-align:center}
+  .right{margin-left:auto}
+  .note{border-left:4px solid var(--brand);background:#f6fffa;padding:.6em .8em;margin:.8em 0;color:#053}
+  button.preset, .btn{border:0;background:#0b6;color:#fff;padding:.45em .75em;border-radius:8px;cursor:pointer}
+  .small{font-size:.92em}
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}
+  .success{color:#064}
+  .warn{color:#b45309}
+  @media print{header.hero .wrap{padding-bottom:8px} .card button,.toolbar{display:none} body{background:#fff} .calc{box-shadow:none}}
+  :focus-visible{outline:3px solid rgba(0,128,96,.5);outline-offset:3px;border-radius:6px}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="pill">しもごおり山の手保育園</span>
+    <h1>あなたの働き方で、いくらになる？</h1>
+    <p class="muted">173.5h固定。賞与は<strong>基本給×月数</strong>を算定基礎に試算。最終更新：<time id="last-updated" aria-live="polite">—</time>／作成：<strong>三浦 一隼</strong></p>
+    <p class="small muted">※ 基本時給は一律 <strong>¥1,050</strong>（モデル）。上限時間の概念を廃止しました。</p>
+    <div class="toolbar">
+      <button id="resetBtn" class="btn" type="button" title="入力を初期化">リセット</button>
+      <button id="copyLinkBtn" class="btn" type="button" title="いまの条件を共有するURLをコピー">状態リンクをコピー</button>
+      <span id="copyState" class="small muted" aria-live="polite"></span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section>
+    <h2>① 働き方プリセット</h2>
+    <div class="grid cards">
+      <div class="card">
+        <h4>標準</h4>
+        <p class="muted">最低条件：月〜土の8時間<strong>固定</strong>シフト制。</p>
+        <button class="preset" onclick="setPreset('standard')">これで見る</button>
+      </div>
+      <div class="card">
+        <h4>カスタム①</h4>
+        <p class="muted">クラス運営なし。時間帯は最低条件の賃金に合わせて計算。</p>
+        <button class="preset" onclick="setPreset('custom1')">これで見る</button>
+      </div>
+      <div class="card">
+        <h4>カスタム②</h4>
+        <p class="muted">クラス運営あり（+¥70/時）その他は最低条件。</p>
+        <button class="preset" onclick="setPreset('custom2')">これで見る</button>
+      </div>
+      <div class="card">
+        <h4>カスタム③</h4>
+        <p class="muted">クラス運営＋時間帯最大（7:00〜20:00）。基本給以外の加算は上限マックス。</p>
+        <button class="preset" onclick="setPreset('custom3')">これで見る</button>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>② 条件を選んで試算</h2>
+    <div class="calc" id="calc" role="region" aria-label="賃金試算">
+
+      <!-- シフト選択（上限時間は廃止） -->
+      <div class="row">
+        <label for="shift">シフト選択：</label>
+        <select id="shift">
+          <option value="A">Aパターン（1日8h：休憩60分）</option>
+          <option value="B">Bパターン（1日8.5h：休憩60–90分）</option>
+          <option value="C">Cパターン（1日9h：休憩90分）</option>
+        </select>
+      </div>
+
+      <!-- 時間帯・曜日 -->
+      <div class="row">
+        <label for="band">時間帯対応：</label>
+        <select id="band">
+          <option value="25a">7:00～対応（＋¥25）</option>
+          <option value="25e">〜20:00対応（＋¥25）</option>
+          <option value="50">7:00～20:00対応（＋¥50）</option>
+          <option value="0z">8:00～18:00（＋¥0）</option>
+        </select>
+        <label class="right"><input type="checkbox" id="wkAll"> 月～日すべて対応（＋¥50/時）</label>
+      </div>
+
+      <!-- その他の加算 -->
+      <fieldset style="border:1px solid #ddd;border-radius:8px;padding:10px">
+        <legend style="padding:0 6px">その他の同意</legend>
+        <div class="checks">
+          <label class="chk"><input type="checkbox" id="sixConsent"> 六連続勤務に同意（＋¥10/時）</label>
+          <label class="chk"><input type="checkbox" id="shiftFlex"> シフト融通手当（提出後の時間帯変更の約束）＋¥20/時</label>
+          <label class="chk"><input type="checkbox" id="holidaySub"> 休日振替手当（提出後の休日変更の約束）＋¥50/時</label>
+          <label class="chk"><input type="checkbox" id="classDuty"> クラス運営あり（＋¥70/時）</label>
+          <label class="chk"><input type="checkbox" id="trained" checked> 研修受講（処遇改善手当Ⅱの対象）</label>
+        </div>
+      </fieldset>
+
+      <!-- 経験者加算（時給に加算／内訳は職務手当に算入） -->
+      <fieldset style="border:1px solid #ddd;border-radius:8px;padding:10px">
+        <legend style="padding:0 6px">保育施設 経験者加算（時給に加算／内訳は職務手当に算入）</legend>
+        <div class="checks">
+          <label><input type="radio" name="exp" value="0" checked> 該当なし</label>
+          <label><input type="radio" name="exp" value="50"> 入職〜5年未満（＋¥50/時）</label>
+          <label><input type="radio" name="exp" value="100"> 5〜10年未満（＋¥100/時）</label>
+          <label><input type="radio" name="exp" value="150"> 10〜20年（＋¥150/時）</label>
+          <label><input type="radio" name="exp" value="200"> 20〜30年（＋¥200/時）</label>
+        </div>
+        <p class="muted small">※ 経験者加算は時給に加算されますが、内訳では<strong>職務手当に算入</strong>します。職務手当が30,000円を超えた場合、その超過分は<strong>調整手当</strong>に算入します。</p>
+      </fieldset>
+
+      <!-- 結果（時給・月額） -->
+      <div class="row result" style="margin-top:.6em">
+        <div>時給（モデル）：<span id="hourly" class="num">—</span></div>
+        <div class="right">月額（時給×<u>173.5h固定</u>）：<span id="monthlyRaw" class="num">—</span></div>
+      </div>
+
+      <!-- 内訳 -->
+      <h3>内訳（173.5hベース）</h3>
+      <div class="note small">「総支給＝内訳の合計」を<abbr title="丸め誤差が出ないよう整数で配分しています">厳密一致</abbr>に調整済み。</div>
+      <table id="breakdown">
+        <thead>
+          <tr><th>項目</th><th>金額</th><th>備考</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>基本給</td>
+            <td id="bk-basic" class="num">—</td>
+            <td id="bk-basic-note" class="small">最低額：¥181,000。経験者加算は職務手当に算入（30,000円超過は調整手当へ）。基本給の超過分は職務へ算入。</td>
+          </tr>
+          <tr><td>【一律】資格手当</td><td id="bk-qual" class="num">—</td><td>固定（優先1）</td></tr>
+          <tr>
+            <td>【一律】職務手当</td>
+            <td id="bk-duty" class="num">—</td>
+            <td>
+              10,000〜<strong>30,000</strong>（上限）。時間帯以外の加算＋<strong>経験者加算</strong>を内包。<br>
+              <div class="mini">内訳：六連続 <span id="duty-six" class="num">—</span> ／ 融通 <span id="duty-flex" class="num">—</span> ／ 休日振替 <span id="duty-holi" class="num">—</span> ／ クラス運営 <span id="duty-class" class="num">—</span></div>
+            </td>
+          </tr>
+          <tr><td>処遇改善手当Ⅱ</td><td id="bk-proc2" class="num">—</td><td><strong>0</strong>〜40,000：時間帯＋曜日加算を集約（研修受講者）</td></tr>
+          <tr><td>調整手当</td><td id="bk-adjust" class="num">—</td><td><strong>0</strong>〜40,000：職務手当上限超過分のみ配分（経験者加算の超過も含む）</td></tr>
+          <tr><td>交通費</td><td id="bk-commute" class="num">—</td><td>会社規定（総額内の配分）</td></tr>
+          <tr><td>車両手当</td><td id="bk-car" class="num">—</td><td>会社規定（総額内の配分）</td></tr>
+        </tbody>
+        <tfoot>
+          <tr><th>総支給（モデル・月次）</th><th id="bk-total" class="num">—</th><th>※ 月額（時給×173.5h）と常に一致</th></tr>
+        </tfoot>
+      </table>
+
+      <!-- 賞与・年収 -->
+      <h3>賞与・年収の試算（算定基礎：基本給）</h3>
+      <fieldset style="border:1px solid #ddd;border-radius:8px;padding:10px">
+        <legend style="padding:0 6px">賞与設定（算定基礎：基本給）</legend>
+        <div class="checks">
+          <label class="chk"><input type="checkbox" id="bonusUse"> 賞与を支給</label>
+          <label> 月数：
+            <select id="bonusMonths">
+              <option value="1">1か月</option>
+              <option value="2">2か月</option>
+            </select>
+          </label>
+          <label class="chk"><input type="checkbox" id="yearendUse"> 年度末賞与を支給</label>
+          <label> 金額：
+            <select id="yearendAmt">
+              <option value="100000">¥100,000</option>
+              <option value="150000">¥150,000</option>
+              <option value="200000">¥200,000</option>
+              <option value="250000">¥250,000</option>
+              <option value="300000">¥300,000</option>
+            </select>
+          </label>
+        </div>
+      </fieldset>
+
+      <table>
+        <tbody>
+          <tr><th>年収（モデル）</th><td id="annual" class="num">—</td></tr>
+        </tbody>
+      </table>
+
+    </div>
+  </section>
+
+  <footer>
+    <p>© Shimoori Yamanote Nursery. 作成：<strong>三浦 一隼</strong></p>
+  </footer>
+</main>
+
+<script>
+/* ========= 173.5h固定・上限撤廃・経験者配分変更（改訂 v3） ========= */
+(function(){
+  // 日付
+  try{
+    const tz='Asia/Tokyo', d=new Date();
+    const fmt=new Intl.DateTimeFormat('ja-JP',{timeZone:tz,year:'numeric',month:'2-digit',day:'2-digit'});
+    document.getElementById('last-updated').textContent=fmt.format(d);
+  }catch(e){}
+
+  // 定数
+  const HOURS = 173.5;
+  const BASE_FLAT = 1050;       // 基本時給は一律
+  const QUAL = 15000;
+  const BASIC_MIN = 181000;
+  const PROC2_MIN=0, PROC2_MAX=40000;   // 処遇Ⅱ
+  const DUTY_MIN=10000,  DUTY_MAX=30000;// 職務
+  const ADJ_MIN =0,      ADJ_MAX =40000;// 調整
+  const COMMUTE = 4200,  CAR = 5800;
+
+  const JPY = new Intl.NumberFormat('ja-JP',{style:'currency',currency:'JPY',maximumFractionDigits:0});
+  const yen = n => JPY.format(Math.round(n));
+
+  // UI参照
+  const shiftSel = document.getElementById('shift');
+  const bandSel  = document.getElementById('band');
+  const wkAll    = document.getElementById('wkAll');
+
+  const sixConsent = document.getElementById('sixConsent'); // +10
+  const shiftFlex  = document.getElementById('shiftFlex');  // +20
+  const holidaySub = document.getElementById('holidaySub'); // +50
+  const classDuty  = document.getElementById('classDuty');  // +70
+  const trained    = document.getElementById('trained');    // 処遇Ⅱ対象
+
+  const expRadios  = [...document.querySelectorAll('input[name="exp"]')];
+
+  const hourlyOut  = document.getElementById('hourly');
+  const monthlyRaw = document.getElementById('monthlyRaw');
+
+  // 内訳
+  const bkBasic  = document.getElementById('bk-basic');
+  const bkBasicNote = document.getElementById('bk-basic-note');
+  const bkQual   = document.getElementById('bk-qual');
+  const bkDuty   = document.getElementById('bk-duty');
+  const bkProc2  = document.getElementById('bk-proc2');
+  const bkAdjust = document.getElementById('bk-adjust');
+  const bkCommute= document.getElementById('bk-commute');
+  const bkCar    = document.getElementById('bk-car');
+  const bkTotal  = document.getElementById('bk-total');
+
+  const dutySix  = document.getElementById('duty-six');
+  const dutyFlex = document.getElementById('duty-flex');
+  const dutyHoli = document.getElementById('duty-holi');
+  const dutyClass= document.getElementById('duty-class');
+
+  // 賞与
+  const bonusUse = document.getElementById('bonusUse');
+  const bonusMonths = document.getElementById('bonusMonths');
+  const yearendUse = document.getElementById('yearendUse');
+  const yearendAmt = document.getElementById('yearendAmt');
+  const annualOut  = document.getElementById('annual');
+
+  // ツールバー
+  const resetBtn = document.getElementById('resetBtn');
+  const copyLinkBtn = document.getElementById('copyLinkBtn');
+  const copyState = document.getElementById('copyState');
+
+  function bandAddValue(v){ if(v==='50') return 50; if(v==='25a'||v==='25e') return 25; return 0; }
+  function getBaseHourly(){ return BASE_FLAT; }
+  function getExpHourly(){ const r = expRadios.find(x=>x.checked); return r?parseInt(r.value,10):0; }
+  function clamp(v,min,max){ return Math.min(max, Math.max(min, v)); }
+
+  // URL ⇄ 状態 同期
+  function encodeState(){
+    const s={
+      shift:shiftSel.value, band:bandSel.value, wkAll:wkAll.checked?1:0,
+      six:sixConsent.checked?1:0, flex:shiftFlex.checked?1:0, holi:holidaySub.checked?1:0, cls:classDuty.checked?1:0,
+      tr:trained.checked?1:0, exp:getExpHourly(), b:bonusUse.checked?1:0, bm:bonusMonths.value, y:yearendUse.checked?1:0, ya:yearendAmt.value
+    };
+    return btoa(encodeURIComponent(JSON.stringify(s)));
+  }
+  function decodeState(str){
+    try{ return JSON.parse(decodeURIComponent(atob(str))); }catch(e){ return null; }
+  }
+  function applyState(s){
+    if(!s) return;
+    shiftSel.value=s.shift||'A'; bandSel.value=s.band||'0z';
+    wkAll.checked=!!s.wkAll; sixConsent.checked=!!s.six; shiftFlex.checked=!!s.flex; holidaySub.checked=!!s.holi; classDuty.checked=!!s.cls;
+    trained.checked = !!s.tr; (expRadios.find(x=>x.value===(s.exp+''))||expRadios[0]).checked=true;
+    bonusUse.checked=!!s.b; bonusMonths.value=s.bm||'1'; yearendUse.checked=!!s.y; yearendAmt.value=s.ya||'100000';
+  }
+
+  function calc(){
+    const base = getBaseHourly();
+
+    // 時給加算
+    const expH  = getExpHourly();
+    const bandH = bandAddValue(bandSel.value);
+    const weekH = wkAll.checked ? 50 : 0;
+    const sixH  = sixConsent.checked ? 10 : 0;
+    const flexH = shiftFlex.checked ? 20 : 0;
+    const holiH = holidaySub.checked ? 50 : 0;
+    const classH= classDuty.checked ? 70 : 0;
+
+    const hourly = base + expH + bandH + weekH + sixH + flexH + holiH + classH;
+    const monthly = Math.round(hourly * HOURS);
+
+    hourlyOut.textContent  = yen(hourly);
+    monthlyRaw.textContent = yen(monthly);
+
+    // ===== 配分（厳密一致） =====
+    // 基本給保護（経験者分は基本給に入れない）
+    const expMonthly = expH * HOURS; // 経験者分（→職務/調整へ）
+    const protectedBasic = BASIC_MIN;
+
+    // 固定枠
+    let qual=QUAL, commute=COMMUTE, car=CAR;
+
+    // 処遇Ⅱ（時間帯＋曜日）
+    const amt_proc2 = (bandH + weekH) * HOURS; // 上限40,000
+    let proc2 = 0;
+    if(trained && trained.checked){ proc2 = clamp(amt_proc2, PROC2_MIN, PROC2_MAX); }
+
+    // 職務プール＝六連続/融通/休日/クラス運営＋（未受講なら band/week も）＋ 経験者加算
+    const poolDuty = (sixH + flexH + holiH + classH) * HOURS + ((trained && trained.checked)? 0 : amt_proc2) + expMonthly;
+    let duty = 0, adjust = 0;
+    if(poolDuty > 0){
+      duty = clamp(poolDuty, DUTY_MIN, DUTY_MAX);
+      const residual = Math.max(0, poolDuty - duty);
+      adjust = clamp(residual, ADJ_MIN, ADJ_MAX);
+    }
+
+    // 一旦の基本給（総額から差し引き）
+    let basic = monthly - (qual + commute + car + proc2 + duty + adjust);
+    // 保護ラインまで引上げ
+    if(basic < protectedBasic){
+      const need = protectedBasic - basic;
+      basic += need;
+      // 合計維持のため調整→職務の順で減算
+      if(adjust >= need){ adjust -= need; }
+      else { const rest = need - adjust; adjust = 0; duty = Math.max(0, duty - rest); }
+    }
+    // 基本給が保護ラインを超える分は職務へ（職務上限を超えたら調整へ）
+    if(basic > protectedBasic){
+      const over = basic - protectedBasic;
+      basic = protectedBasic;
+      duty += over;
+      if(duty > DUTY_MAX){ adjust += (duty - DUTY_MAX); duty = DUTY_MAX; }
+    }
+
+    // 万一の丸め調整（総和=monthlyに合わせる）
+    let sum = basic+qual+commute+car+proc2+duty+adjust;
+    const diff = monthly - sum;
+    if(diff !== 0){
+      if(adjust + diff >= 0){ adjust += diff; }
+      else if(duty + diff >= 0){ duty += diff; if(duty>DUTY_MAX){ adjust += (duty-DUTY_MAX); duty=DUTY_MAX; } }
+      else { basic += diff; if(basic<protectedBasic){ basic=protectedBasic; } }
+      sum = basic+qual+commute+car+proc2+duty+adjust;
+    }
+
+    // 職務内訳目安
+    const amtSix  = sixH  * HOURS;
+    const amtFlex = flexH * HOURS;
+    const amtHoli = holiH * HOURS;
+    const amtClass= classH* HOURS;
+
+    // 表示
+    bkBasic.textContent   = yen(basic);
+    bkBasicNote.textContent = `最低額：${yen(BASIC_MIN)}。経験者加算は職務手当に算入し、30,000円超過分は調整手当へ配分。基本給の超過分は職務へ算入。`;
+    bkQual.textContent    = yen(qual);
+    bkCommute.textContent = yen(commute);
+    bkCar.textContent     = yen(car);
+    bkProc2.textContent   = yen(proc2);
+    bkAdjust.textContent  = yen(adjust);
+    bkDuty.textContent    = yen(duty);
+    dutySix.textContent   = yen(amtSix);
+    dutyFlex.textContent  = yen(amtFlex);
+    dutyHoli.textContent  = yen(amtHoli);
+    dutyClass.textContent = yen(amtClass);
+    bkTotal.textContent   = yen(sum);
+
+    // 年収（= 月次×12 + 基本給×賞与月数 + 年度末賞与）
+    const bUse = bonusUse.checked, yUse = yearendUse.checked;
+    const bMonths = parseInt(bonusMonths.value||'0',10);
+    const yAmt = parseInt(yearendAmt.value||'0',10);
+    const annual = (monthly * 12) + (bUse ? basic * bMonths : 0) + (yUse ? yAmt : 0);
+    annualOut.textContent = yen(annual);
+
+    // URLを更新（hash）
+    const code=encodeState();
+    history.replaceState(null,'', location.pathname + '#s=' + code);
+  }
+
+  // 監視
+  [shiftSel, bandSel, wkAll, sixConsent, shiftFlex, holidaySub, classDuty, trained,
+   bonusUse, bonusMonths, yearendUse, yearendAmt, ...expRadios].forEach(el=>{
+     el.addEventListener('change', calc);
+  });
+
+  // プリセット
+  window.setPreset = function(name){
+    // 初期化
+    shiftSel.value='A';
+    bandSel.value='0z'; wkAll.checked=false;
+    sixConsent.checked=false; shiftFlex.checked=false; holidaySub.checked=false;
+    classDuty.checked=false; trained.checked=true;
+    expRadios.forEach(x=>x.checked = (x.value==='0'));
+
+    if(name==='custom2'){ classDuty.checked = true; bandSel.value='0z'; }
+    if(name==='custom3'){
+      classDuty.checked = true; bandSel.value='50'; wkAll.checked = true;
+      sixConsent.checked = true; shiftFlex.checked = true; holidaySub.checked = true;
+    }
+    calc();
+  }
+
+  // リセット / 状態リンク
+  resetBtn.addEventListener('click', ()=>{ setPreset('standard'); copyState.textContent=''; });
+  copyLinkBtn.addEventListener('click', async ()=>{
+    try{
+      await navigator.clipboard.writeText(location.href);
+      copyState.textContent='リンクをコピーしました。';
+      copyState.className='small success';
+      setTimeout(()=>{copyState.textContent='';}, 3000);
+    }catch(e){
+      copyState.textContent='コピーに失敗しました。URLを手動でコピーしてください。';
+      copyState.className='small warn';
+    }
+  });
+
+  function init(){
+    const m=location.hash.match(/#s=([^&]+)/);
+    if(m){ const st=decodeState(m[1]); if(st){ applyState(st); }}
+    calc();
+  }
+  init();
+})();
+</script>
+</body>
+</html>
