@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>〇〇保育園｜採用パンフレット</title>
+<style>
+  :root{
+    --bg:#f7f9fb;
+    --ink:#24324a;
+    --muted:#5c6b86;
+    --brand:#79c2c8;    /* ミント */
+    --accent:#f6b3b0;   /* サーモンピンク */
+    --lemon:#ffe59d;    /* レモン */
+    --card:#ffffff;
+    --radius:18px;
+    --shadow:0 8px 24px rgba(18,34,66,.08);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0; padding:0; color:var(--ink); background:var(--bg); font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP","Segoe UI",Roboto,"Helvetica Neue",Arial,"メイリオ",sans-serif; line-height:1.65}
+  a{color:#106a71; text-decoration:none}
+  h1,h2,h3{margin:.2em 0 .4em}
+  h1{font-size:32px}
+  h2{font-size:22px}
+  h3{font-size:18px; color:var(--muted)}
+  p{margin:.4em 0}
+  ul{margin:.2em 0 .8em 1.2em}
+
+  /* ページレイアウト（A4想定） */
+  .sheet{max-width:920px; margin:24px auto; padding:0 16px}
+  .page{background:var(--card); border-radius:24px; overflow:hidden; box-shadow:var(--shadow); margin:18px auto; position:relative}
+  .page-inner{padding:28px}
+  .grid{display:grid; gap:16px}
+  .col-2{grid-template-columns:1.3fr 1fr}
+  .col-3{grid-template-columns:repeat(3,1fr)}
+  .card{background:var(--card); border-radius:var(--radius); padding:18px; box-shadow:var(--shadow)}
+  .badge{display:inline-block; padding:.25em .6em; border-radius:999px; font-size:12px; background:var(--lemon)}
+
+  /* ヒーロー */
+  .hero{display:grid; grid-template-columns:1.1fr .9fr; gap:18px; align-items:stretch}
+  .hero .visual{border-radius:24px; overflow:hidden; background:linear-gradient(135deg, #fde2e0, #e2f7f9)}
+  .hero .visual .ph{height:100%; min-height:280px; background:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="%23ffe1de"/><stop offset="1" stop-color="%23e0f7fb"/></linearGradient></defs><rect width="1200" height="800" fill="url(%23g)"/><circle cx="250" cy="220" r="140" fill="%23f6b3b0" opacity="0.55"/><circle cx="980" cy="540" r="160" fill="%2379c2c8" opacity="0.55"/></svg>') center/cover no-repeat}
+  .hero .copy{background:#fff; border-radius:24px; padding:22px 22px 18px; display:flex; flex-direction:column; justify-content:center; gap:10px; box-shadow:var(--shadow)}
+  .tagline{font-size:14px; letter-spacing:.08em; color:#0e6a70}
+  .lead{font-size:26px; font-weight:700}
+
+  /* 情報ボックス */
+  .info-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+  .pill{background:#eef7f7; border-radius:999px; padding:.45em .9em; font-size:13px; display:inline-flex; gap:.4em; align-items:center}
+
+  /* セクション見出し */
+  .sec-title{display:flex; align-items:center; gap:10px; margin:4px 0 10px}
+  .sec-dot{width:14px; height:14px; border-radius:50%; background:var(--brand)}
+  .sec-title h2{margin:0}
+
+  /* リスト（チェック） */
+  .ck{list-style:none; padding:0; margin:.3em 0}
+  .ck li{position:relative; padding-left:28px; margin:.35em 0}
+  .ck li:before{content:""; position:absolute; left:0; top:.35em; width:18px; height:18px; border-radius:6px; background:var(--brand)}
+  .ck li:after{content:""; position:absolute; left:6px; top:.55em; width:6px; height:10px; border:2px solid #fff; border-top:0; border-left:0; transform:rotate(45deg)}
+
+  /* テーブル風ボックス */
+  .kv{display:grid; grid-template-columns:140px 1fr; gap:8px; font-size:14px}
+  .kv div{background:#f5f8fb; padding:10px 12px; border-radius:12px}
+  .kv div.key{background:#eaf4ff; font-weight:600}
+
+  /* 先輩の声 */
+  .voice{display:grid; grid-template-columns:86px 1fr; gap:12px; align-items:start}
+  .avatar{width:86px; height:86px; border-radius:50%; background:linear-gradient(135deg,#e7f7f7,#ffe5e2)}
+  .bubble{background:#fff; border-radius:18px; padding:12px 14px; box-shadow:var(--shadow)}
+
+  /* フッター */
+  .footer{display:flex; gap:16px; align-items:center; justify-content:space-between; margin-top:10px; font-size:13px; color:var(--muted)}
+  .qr{width:96px; height:96px; background:repeating-linear-gradient(45deg,#111 0 6px,#fff 6px 12px); border-radius:12px; box-shadow:var(--shadow)}
+  .map{height:140px; background:linear-gradient(135deg,#eef5ff,#f7fff2); border-radius:16px}
+
+  /* 配色アクセントの帯 */
+  .ribbon{height:10px; background:linear-gradient(90deg,var(--brand),var(--accent)); border-radius:10px}
+
+  /* 印刷 */
+  @media print{
+    body{background:#fff}
+    .sheet{max-width:100%; padding:0}
+    .page{border-radius:0; box-shadow:none; margin:0; page-break-after:always}
+    .ribbon{border-radius:0}
+    a[href]:after{content:" (" attr(href) ")"; font-size:10px}
+  }
+</style>
+</head>
+<body>
+  <div class="sheet">
+
+    <!-- 表：1ページ目（表面） -->
+    <section class="page">
+      <div class="ribbon"></div>
+      <div class="page-inner grid" style="gap:22px">
+        <!-- HERO -->
+        <div class="hero">
+          <div class="visual">
+            <div class="ph" aria-label="園の雰囲気写真のプレースホルダー"></div>
+          </div>
+          <div class="copy">
+            <span class="tagline">RECRUIT / 〇〇保育園</span>
+            <div class="lead">子どもと共に、私たちも育つ場所。</div>
+            <p>地域に根ざし、一人ひとりの個性と生活を大切にする保育を実践。安心して長く働ける、あたたかな職場です。</p>
+            <div class="info-grid">
+              <div class="card">
+                <div class="sec-title"><span class="sec-dot"></span><h2>園の概要</h2></div>
+                <div class="kv">
+                  <div class="key">所在地</div><div>〒000-0000 東京都〇〇区〇〇 0-0-0</div>
+                  <div class="key">定員 / 対象</div><div>60名 / 0〜5歳</div>
+                  <div class="key">開園時間</div><div>7:00〜19:00（延長あり）</div>
+                  <div class="key">アクセス</div><div>〇〇駅より徒歩7分</div>
+                </div>
+              </div>
+              <div class="card">
+                <div class="sec-title"><span class="sec-dot" style="background:var(--accent)"></span><h2>募集概要</h2></div>
+                <ul class="ck">
+                  <li>保育士（正職員 / パート）</li>
+                  <li>栄養士・調理員</li>
+                  <li>保育補助（資格不問）</li>
+                </ul>
+                <p class="badge">見学歓迎・Web応募OK</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 保育の特徴 / 年間行事ダイジェスト -->
+        <div class="grid col-3">
+          <div class="card">
+            <div class="sec-title"><span class="sec-dot"></span><h2>保育の特徴</h2></div>
+            <ul class="ck">
+              <li>異年齢の関わりを大切にした生活と遊び</li>
+              <li>食育・季節の行事・自然体験の充実</li>
+              <li>丁寧な丁寧語りかけ・読み聞かせ</li>
+              <li>安全衛生・防災訓練を定期実施</li>
+            </ul>
+          </div>
+          <div class="card">
+            <div class="sec-title"><span class="sec-dot"></span><h2>一日の流れ（例）</h2></div>
+            <p>
+              登園・健康観察 → あそび → 給食 → 午睡 → おやつ → 降園対応
+            </p>
+            <p class="muted" style="color:var(--muted); font-size:13px">※ クラス・シフトにより異なります。</p>
+          </div>
+          <div class="card">
+            <div class="sec-title"><span class="sec-dot"></span><h2>設備</h2></div>
+            <ul class="ck">
+              <li>0歳児室・調乳設備・午睡モニタ</li>
+              <li>園庭・屋上園庭・絵本コーナー</li>
+              <li>給食室（自園調理）</li>
+              <li>バリアフリー / 空調・湿度管理</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 裏：2ページ目（裏面） -->
+    <section class="page">
+      <div class="ribbon"></div>
+      <div class="page-inner grid col-2">
+        <!-- 左カラム：待遇と魅力 -->
+        <div class="grid" style="gap:16px">
+          <div class="card">
+            <div class="sec-title"><span class="sec-dot"></span><h2>募集職種・仕事内容</h2></div>
+            <h3>保育士</h3>
+            <ul class="ck">
+              <li>クラス担任またはフリー／保育全般</li>
+              <li>行事の企画・準備、保護者対応</li>
+            </ul>
+            <h3>栄養士・調理員</h3>
+            <ul class="ck">
+              <li>給食・おやつの調理、献立・発注</li>
+              <li>アレルギー対応・食育の連携</li>
+            </ul>
+            <h3>保育補助（パート）</h3>
+            <ul class="ck">
+              <li>見守り・清掃・行事サポートなど</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <div class="sec-title"><span class="sec-dot"></span><h2>働く環境・待遇</h2></div>
+            <ul class="ck">
+              <li>雇用形態：正職員 / パート</li>
+              <li>給与：月給〇〇万円〜（経験考慮）</li>
+              <li>賞与：年2回、昇給あり</li>
+              <li>社保完備 / 交通費全額支給</li>
+              <li>有給取得率〇％（昨年度）</li>
+              <li>産休・育休取得実績、復帰支援</li>
+              <li>研修制度・外部講座受講支援</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <div class="sec-title"><span class="sec-dot"></span><h2>〇〇保育園で働くメリット</h2></div>
+            <ul class="ck">
+              <li>子どもの成長をチームで喜べる文化</li>
+              <li>持ち帰り・残業の削減に取り組み</li>
+              <li>未経験・ブランクも手厚くサポート</li>
+              <li>記録・連絡のICT化で業務効率UP</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <div class="sec-title"><span class="sec-dot"></span><h2>先輩の声</h2></div>
+            <div class="voice">
+              <div class="avatar" aria-hidden="true"></div>
+              <div class="bubble">
+                <strong>入職3年目 保育士</strong>
+                <p>子どもたちの「できた！」を一緒に喜べる瞬間がいちばんのやりがい。チームで支え合えるので安心して挑戦できます。</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 右カラム：応募フローと連絡先 -->
+        <div class="grid" style="gap:16px">
+          <div class="card">
+            <div class="sec-title"><span class="sec-dot"></span><h2>応募方法・採用フロー</h2></div>
+            <ol style="margin:.2em 0 1em 1.2em">
+              <li>応募（電話またはメール、Webフォーム）</li>
+              <li>園見学・説明（オンライン可）</li>
+              <li>面接（1回）</li>
+              <li>内定・採用手続き</li>
+            </ol>
+            <div class="kv" style="margin-top:8px">
+              <div class="key">応募書類</div><div>履歴書（写真付）／資格証写し</div>
+              <div class="key">連絡先</div><div>TEL：00-0000-0000　Mail：recruit@example.jp</div>
+              <div class="key">担当</div><div>採用係（平日9:00-18:00）</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="sec-title"><span class="sec-dot"></span><h2>アクセス</h2></div>
+            <div class="map" aria-label="地図のプレースホルダー"></div>
+            <div class="footer">
+              <div>
+                <strong>社会福祉法人 〇〇会 〇〇保育園</strong><br/>
+                〒000-0000 東京都〇〇区〇〇0-0-0 / 〇〇駅 徒歩7分
+              </div>
+              <div>
+                <div class="qr" aria-label="QRコードのプレースホルダー"></div>
+                <div style="font-size:12px; text-align:center; margin-top:6px">採用ページ</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="background:linear-gradient(135deg,#fff, #fef6f5)">
+            <div class="sec-title"><span class="sec-dot" style="background:var(--accent)"></span><h2>メッセージ</h2></div>
+            <p style="font-size:18px; font-weight:700">一緒に、子どもたちの未来を育てましょう。</p>
+            <p>見学はいつでも歓迎です。日程調整や働き方の相談のみでもお気軽にご連絡ください。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</body>
+</html>
