@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>正規職員 面接フローチャート｜しもごおり山の手保育園（完全版・金額非表示）</title>
+<style>
+  :root{
+    --w: 980px; --fg:#1a1a1a; --muted:#64748b; --line:#e5e7eb; --brand:#0ba375; --bg:#f8fafc;
+    --chip:#eef8f3; --chip-fg:#0d684f; --node:#ffffff;
+  }
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans JP","Hiragino Kaku Gothic ProN",Meiryo,sans-serif;line-height:1.7}
+  .wrap{max-width:var(--w);margin:auto;padding:28px}
+  header{background:#fff;border-bottom:1px solid var(--line)}
+  h1{margin:.2em 0 .4em;font-size:1.8rem}
+  h2{font-size:1.15rem;margin:1.2em 0 .6em}
+  .muted{color:var(--muted)}
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px}
+  .btn{border:0;background:var(--brand);color:#fff;padding:.5em .9em;border-radius:10px;cursor:pointer}
+  .btn.secondary{background:#0e766e}
+  .btn.ghost{background:#fff;color:var(--brand);border:1px solid var(--brand)}
+  .note{border-left:4px solid var(--brand);background:#eefcf6;padding:.6em .8em;border-radius:8px;margin:12px 0}
+
+  /* Layout */
+  .layout .cols{display:grid;grid-template-columns:1fr 360px;gap:20px}
+  .col-aside{position:sticky;top:16px;height:fit-content}
+  .panel{background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,.04);padding:14px 16px;margin-bottom:14px}
+  .panel h3{margin:.1em 0 .5em;font-size:1.05rem}
+  .only-interviewer{}
+  body.candidate-view .only-interviewer{display:none !important}
+  /* メインカラム内の面接官専用ブロックは非表示（右カラムに集約） */
+  .col-main .only-interviewer{display:none !important}
+
+  .smallhelp{font-size:.9rem;color:var(--muted)}
+  textarea.inline{width:100%;min-height:110px;padding:10px;border:1px solid var(--line);border-radius:10px;font:inherit}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .input{display:grid;gap:6px}
+  .input input,.input select{padding:9px 10px;border:1px solid var(--line);border-radius:10px;font:inherit}
+  pre.code{background:#0b1220;color:#e6edf3;border-radius:10px;padding:12px;overflow:auto}
+  .toast{position:fixed;right:16px;bottom:16px;background:#0ba375;color:#fff;padding:.6em .9em;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,.2);opacity:0;transform:translateY(6px);transition:.25s}
+  .toast.show{opacity:1;transform:translateY(0)}
+
+  /* Flow nodes */
+  .flow{position:relative;display:grid;gap:18px;margin:18px 0}
+  .node{position:relative;background:var(--node);border:1px solid var(--line);border-radius:14px;box-shadow:0 6px 18px rgba(0,0,0,.04);padding:14px 16px}
+  .node h3{margin:.1em 0 .5em;font-size:1.05rem}
+  .node .desc{font-size:.95rem;color:var(--muted);margin:.2em 0 .6em}
+  .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  fieldset{border:1px dashed var(--line);border-radius:10px;padding:10px;margin:.4em 0}
+  legend{padding:0 6px;color:#0f766e}
+  label{display:inline-flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid var(--line);border-radius:10px;background:#fff;cursor:pointer}
+  input[type="radio"],input[type="checkbox"]{accent-color:var(--brand)}
+  .arrow::after{content:"↓";position:absolute;left:50%;transform:translateX(-50%);bottom:-14px;color:#9aa4af}
+
+  /* Summary chips */
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{display:inline-flex;gap:6px;align-items:center;background:var(--chip);color:var(--chip-fg);border-radius:999px;padding:.3em .65em;font-size:.95rem}
+  .chip b{font-weight:600}
+
+  .script-body{white-space:normal;font-size:.95rem;color:#0f172a;background:#f9fafb;border:1px solid var(--line);border-radius:10px;padding:10px;max-height:420px;overflow:auto}
+  .script-body p{margin:.6em 0}
+
+  @media print{
+    body{background:#fff}
+    header .wrap{padding-bottom:8px}
+    .btn{display:none}
+    .node,.panel{break-inside:avoid}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>正規職員 面接フローチャート（賃金加算は非表示／完全版）</h1>
+    <p class="muted">面接で順に確認し、最後に条件サマリーをコピーできます。金額の提示は別資料・面談後に行います。</p>
+    <div class="toolbar">
+      <button class="btn" id="copyBtn" type="button">サマリーをコピー</button>
+      <button class="btn ghost" id="resetBtn" type="button">リセット</button>
+      <button class="btn secondary only-interviewer" id="toggleViewBtn" type="button" title="応募者ビューに切替">応募者ビュー切替</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap layout"><div class="cols"><div class="col-main">
+  <div class="note">※ このフローチャートは <b>最低条件（①または②）</b> を起点に、<b>金額を明かさず</b> 条件のみを確定するための面接用チェックシートです。</div>
+
+  <section class="flow" id="flow">
+    <!-- 面接官専用：台本と聞き取り欄（応募者からは非表示・右カラムに集約） -->
+    <div class="node only-interviewer">
+      <h3>面接官メモ（台本・左は非表示）</h3>
+      <textarea id="inlineScript" class="inline" placeholder="※右カラムの台本をご利用ください。"></textarea>
+    </div>
+    <div class="node only-interviewer">
+      <h3>面接官メモ（聞き取り・左は非表示）</h3>
+      <textarea id="inlineHearing" class="inline" placeholder="※右カラムの各メモをご利用ください。"></textarea>
+    </div>
+
+    <!-- STEP 1 -->
+    <div class="node arrow">
+      <h3>STEP 1｜最低条件の選択（どちらか必須）</h3>
+      <p class="desc">以下の ① または ② を選択してください。</p>
+      <fieldset>
+        <legend>最低条件</legend>
+        <div class="row">
+          <label><input type="radio" name="base" value="1"/> ① クラス運営あり ＋ 月〜土 8:00–18:00／1日8h×週5</label>
+          <label><input type="radio" name="base" value="2"/> ② クラス運営なし ＋ 月〜土 7:00–20:00／1日8h×週5</label>
+        </div>
+      </fieldset>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="node arrow">
+      <h3>STEP 2｜時間帯対応（任意）</h3>
+      <p class="desc">該当するものを 1 つ選択。未選択でも可。</p>
+      <fieldset>
+        <legend>時間帯</legend>
+        <div class="row">
+          <label><input type="radio" name="band" value="none" checked/> 対応なし</label>
+          <label><input type="radio" name="band" value="am7"/> 7:00 から勤務可</label>
+          <label><input type="radio" name="band" value="pm20"/> 〜20:00 まで勤務可</label>
+          <label><input type="radio" name="band" value="full"/> 7:00–20:00 の両対応可</label>
+        </div>
+      </fieldset>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="node arrow">
+      <h3>STEP 3｜曜日対応（任意）</h3>
+      <fieldset>
+        <legend>日曜対応</legend>
+        <div class="row">
+          <label><input type="radio" name="sun" value="no" checked/> 日曜は不可</label>
+          <label><input type="radio" name="sun" value="yes"/> 日曜も対応可</label>
+        </div>
+      </fieldset>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="node arrow">
+      <h3>STEP 4｜勤務の柔軟性（任意／複数可）</h3>
+      <fieldset>
+        <legend>柔軟性</legend>
+        <div class="row">
+          <label><input type="checkbox" name="flex6"/> 6連続勤務に同意</label>
+          <label><input type="checkbox" name="flexShift"/> シフトの急な時間帯変更に対応</label>
+          <label><input type="checkbox" name="flexHoliday"/> 休日の振替に対応</label>
+        </div>
+      </fieldset>
+    </div>
+
+    <!-- STEP 5 -->
+    <div class="node arrow">
+      <h3>STEP 5｜クラス運営の有無</h3>
+      <p class="desc">①を選ぶと「あり」で固定／②を選ぶと選択可。</p>
+      <fieldset>
+        <legend>クラス運営</legend>
+        <div class="row">
+          <label><input type="radio" name="classDuty" value="yes"/> あり（担任・保護者対応 等）</label>
+          <label><input type="radio" name="classDuty" value="no" checked/> なし</label>
+        </div>
+      </fieldset>
+    </div>
+
+    <!-- STEP 6 -->
+    <div class="node">
+      <h3>STEP 6｜経験年数（いずれか）</h3>
+      <p class="desc">保育施設等での通算経験。金額は面談後に別途算定します。</p>
+      <fieldset>
+        <legend>経験</legend>
+        <div class="row">
+          <label><input type="radio" name="exp" value="none" checked/> 該当なし</label>
+          <label><input type="radio" name="exp" value="y_lt5"/> 入職〜5年未満</label>
+          <label><input type="radio" name="exp" value="y_5_10"/> 5〜10年未満</label>
+          <label><input type="radio" name="exp" value="y_10_20"/> 10〜20年</label>
+          <label><input type="radio" name="exp" value="y_20_30"/> 20〜30年</label>
+        </div>
+      </fieldset>
+    </div>
+  </section>
+
+  <section>
+    <h2>面接サマリー</h2>
+    <div id="summary" class="chips" aria-live="polite"></div>
+  </section>
+</div>
+
+<!-- 右カラム（応募者には非表示） -->
+<aside class="col-aside only-interviewer">
+  <div class="panel">
+    <h3>台本（面接官スクリプト）</h3>
+    <div class="script-body" id="scriptBody">
+      <p><b>導入</b><br>本日はお越しいただきありがとうございます。これから当園の特色とお仕事の進め方を簡単にご説明します。気になる点は途中でも遠慮なくご質問ください。</p>
+
+      <p><b>園の概要</b><br>当園は企業主導型保育事業の保育園で、母体は三浦鉄骨工業株式会社です。最大の特徴は<strong>365日・13時間開所</strong>で、就労家庭をしっかり支える体制をとっています。</p>
+
+      <p><b>保育の考え方</b><br>保育は「家庭の就労を支える福祉機能」という原点を大切にしています。そのため、当園では“先生”というより<strong>“ママ”のように子どもを受容する在り方</strong>を重視。家庭の延長線上の雰囲気を目指し、<strong>エプロンは強制せず</strong>、<strong>ネイルや髪色も常識の範囲でOK</strong>です。保育は<strong>子ども主体</strong>で組み立てます。</p>
+
+      <p><b>外部プログラムとの連携</b><br>日々の保育に“授業”を持ち込むのではなく、外部と連携して必要な教育的要素を取り入れています。</p>
+      <ul>
+        <li>水曜：体操教室</li>
+        <li>木曜（隔週）：リトミック</li>
+        <li>金曜：英語</li>
+      </ul>
+
+      <p><b>認可園との違い（運営面）</b><br>多くの認可園は日曜が閉所ですが、当園は運営の特性上、<strong>日曜を公休として人員配置を最適化</strong>しています（その分、運営の工夫は必要だと考えています）。</p>
+
+      <p><b>利用運用の基本</b><br>365日13時間の運営は利用人数の変動が大きく、人員配置が難しくなります。そのため<strong>児童育成協会の運営ガイドブック</strong>に準拠し、<br>
+      ・利用契約時の就労証明に記載された<strong>保護者の休みは原則お休み</strong><br>
+      ・シフト勤務の保護者は<strong>シフト提出をお願い</strong>し、それを元に利用予定を確定<br>
+      といった運用を取っています。結果として、<strong>職員シフト決定が月末週にずれ込む</strong>ことがあるのが現状の課題です。</p>
+
+      <p><b>就労条件（正規職員の基準）</b><br>働き方は次の<strong>2パターン</strong>が基準です。</p>
+      <ol>
+        <li><b>クラス運営あり</b>：月〜土 8:00–18:00の中で <b>1日8時間×週5日</b></li>
+        <li><b>クラス運営なし</b>：月〜土 7:00–20:00の中で <b>1日8時間×週5日</b></li>
+      </ol>
+
+      <p><b>加算の考え方（概念のみ）</b><br>上記を基準に、<strong>時間帯や柔軟性、経験</strong>などに応じて加算があります（※金額は面談後・別資料でご案内）。例：6連続勤務、シフト融通、休日振替、クラス運営、保育施設での経験年数 など。</p>
+
+      <p><b>クロージング</b><br>以上が当園のご紹介と就労条件の概要です。ここまででご不明点はありますか？このあと勤務のご希望を伺いながら、フローチャートで条件を確定していきます。</p>
+    </div>
+    <p class="smallhelp">※ 応募者ビューでは非表示。面接官だけが閲覧できます。</p>
+  </div>
+
+  <div class="panel">
+    <h3>聞き取りメモ</h3>
+    <textarea id="memoNotes" class="inline" placeholder="志望動機／得意領域／配慮事項／通勤手段／扶養・社保希望 など"></textarea>
+  </div>
+
+  <div class="panel">
+    <h3>入社時メモ（引継ぎ用）</h3>
+    <textarea id="onboardNotes" class="inline" placeholder="配属希望／健康面配慮／通勤・駐車場／制服サイズ／提出書類の進捗 など"></textarea>
+  </div>
+
+  <div class="panel">
+    <h3>送信（面談内容の共有）</h3>
+
+    <!-- 宛先設定 -->
+    <div class="input">
+      <label>宛先（To：園長先生のメール）
+        <input id="mailTo" value="hide@oita-yamanote.com" placeholder="例：principal@example.com">
+      </label>
+    </div>
+    <div class="grid2">
+      <div class="input"><label>CC<input id="mailCc" placeholder="任意：cc@example.com"></label></div>
+      <div class="input"><label>BCC<input id="mailBcc" placeholder="任意：bcc@example.com"></label></div>
+    </div>
+    <div class="input">
+      <label>件名テンプレ
+        <input id="mailSubjectTpl" placeholder="面談記録：{{name}}（しもごおり山の手保育園）">
+      </label>
+      <p class="smallhelp">※ {{name}} は応募者氏名に自動置換</p>
+    </div>
+
+    <!-- 応募者情報 -->
+    <div class="grid2">
+      <div class="input"><label>応募者氏名<input id="candName" placeholder="山田 花子"></label></div>
+      <div class="input"><label>応募者連絡先<input id="candContact" placeholder="メール or 電話"></label></div>
+      <div class="input"><label>面談日<input id="meetAt" type="datetime-local"></label></div>
+      <div class="input"><label>面接官<input id="interviewer" placeholder="三浦 一隼"></label></div>
+    </div>
+
+    <!-- メモ -->
+    <div class="input"><label>台本メモ（任意）<textarea id="scriptNotes" class="inline" placeholder="当日の進行・言い回しの工夫など"></textarea></label></div>
+    <div class="input"><label>面談メモ（任意）<textarea id="hearingNotes" class="inline" placeholder="面談の所感や配置の適性など"></textarea></label></div>
+
+    <!-- プレビュー -->
+    <div class="input"><label>送信データ（確認用プレビュー）<pre id="payloadPreview" class="code"></pre></label></div>
+
+    <!-- アクション -->
+    <div class="row" style="margin-top:6px">
+      <button class="btn" id="mailtoBtn" type="button">メール作成（宛先へ）</button>
+      <button class="btn ghost" id="copyEmailBodyBtn" type="button">本文をコピー</button>
+      <button class="btn ghost" id="copyJsonBtn" type="button">JSONをコピー</button>
+      <button class="btn ghost" id="downloadJsonBtn" type="button">JSONをDL</button>
+    </div>
+    <p class="smallhelp">※ 添付はブラウザ制約で自動付与不可。必要なら「JSONをDL」で保存 → メールに添付。</p>
+  </div>
+</aside>
+</div></main>
+<div id="toast" class="toast">送信しました</div>
+
+<script>
+(function(){
+  const $ = s=>document.querySelector(s);
+  const $$ = s=>Array.from(document.querySelectorAll(s));
+  const summary = $('#summary');
+  const baseRadios = $$('input[name="base"]');
+  const classRadios = $$('input[name="classDuty"]');
+  const resetBtn = $('#resetBtn');
+  const copyBtn = $('#copyBtn');
+
+  function setClassDutyLock(){
+    const base = (baseRadios.find(r=>r.checked)||{}).value;
+    const classYes = classRadios.find(r=>r.value==='yes');
+    const classNo  = classRadios.find(r=>r.value==='no');
+    if(base==='1'){
+      classYes.checked = true;
+      classYes.disabled = true;
+      classNo.disabled = true;
+    }else if(base==='2'){
+      classYes.disabled = false;
+      classNo.disabled = false;
+      if(!classYes.checked && !classNo.checked){ classNo.checked = true; }
+    }else{
+      classYes.disabled = false; classNo.disabled = false;
+    }
+  }
+
+  function chip(txt){
+    const span = document.createElement('span');
+    span.className = 'chip';
+    span.textContent = txt;
+    return span;
+  }
+
+  function render(){
+    setClassDutyLock();
+    summary.innerHTML = '';
+
+    // STEP1
+    const base = (baseRadios.find(r=>r.checked)||{}).value;
+    if(base==='1') summary.appendChild(chip('最低条件：①（クラス運営あり／8:00–18:00／月〜土／8h×週5）'));
+    else if(base==='2') summary.appendChild(chip('最低条件：②（クラス運営なし／7:00–20:00／月〜土／8h×週5）'));
+    else summary.appendChild(chip('最低条件：未選択'));
+
+    // STEP2
+    const band = (document.querySelector('input[name="band"]:checked')||{}).value;
+    const bandMap = {none:'時間帯：指定なし', am7:'時間帯：7:00から可', pm20:'時間帯：〜20:00まで可', full:'時間帯：7:00–20:00両対応'};
+    summary.appendChild(chip(bandMap[band]||'時間帯：未選択'));
+
+    // STEP3
+    const sun = (document.querySelector('input[name="sun"]:checked')||{}).value;
+    summary.appendChild(chip(sun==='yes' ? '日曜対応：可' : '日曜対応：不可'));
+
+    // STEP4
+    const f6 = $('input[name="flex6"]').checked;
+    const fS = $('input[name="flexShift"]').checked;
+    const fH = $('input[name="flexHoliday"]').checked;
+    if(f6||fS||fH){
+      if(f6) summary.appendChild(chip('柔軟性：6連続勤務 同意'));
+      if(fS) summary.appendChild(chip('柔軟性：シフト時間帯の急変更 対応'));
+      if(fH) summary.appendChild(chip('柔軟性：休日振替 対応'));
+    }else{
+      summary.appendChild(chip('柔軟性：特になし'));
+    }
+
+    // STEP5
+    const classDuty = (document.querySelector('input[name="classDuty"]:checked')||{}).value;
+    summary.appendChild(chip(classDuty==='yes' ? 'クラス運営：あり' : 'クラス運営：なし'));
+
+    // STEP6
+    const exp = (document.querySelector('input[name="exp"]:checked')||{}).value;
+    const expMap = {none:'経験：該当なし', y_lt5:'経験：入職〜5年未満', y_5_10:'経験：5〜10年未満', y_10_20:'経験：10〜20年', y_20_30:'経験：20〜30年'};
+    summary.appendChild(chip(expMap[exp]||'経験：未選択'));
+  }
+
+  function resetAll(){
+    $$('input[type="radio"]').forEach(r=>{ r.checked = false; });
+    $$('input[type="checkbox"]').forEach(c=>{ c.checked = false; });
+    document.querySelector('input[name="band"][value="none"]').checked = true;
+    document.querySelector('input[name="sun"][value="no"]').checked = true;
+    document.querySelector('input[name="classDuty"][value="no"]').checked = true;
+    document.querySelector('input[name="exp"][value="none"]').checked = true;
+    render();
+  }
+
+  function copySummary(){
+    const txt = Array.from(summary.querySelectorAll('.chip')).map(n=>`・${n.textContent}`).join('\n');
+    navigator.clipboard.writeText(txt).then(()=>{
+      copyBtn.textContent = 'コピーしました！';
+      setTimeout(()=>copyBtn.textContent='サマリーをコピー', 1800);
+    }).catch(()=>{
+      copyBtn.textContent = 'コピーに失敗しました';
+      setTimeout(()=>copyBtn.textContent='サマリーをコピー', 1800);
+    });
+  }
+
+  document.addEventListener('change', (e)=>{
+    if(e.target.name==='base') setClassDutyLock();
+    render();
+  });
+
+  resetBtn.addEventListener('click', resetAll);
+  copyBtn.addEventListener('click', copySummary);
+
+  // 初期化
+  resetAll();
+})();
+
+// === 応募者ビュー切替 & メール送信処理 ===
+const toggleBtn = document.getElementById('toggleViewBtn');
+const toast = document.getElementById('toast');
+function toastShow(msg){ if(!toast) return; toast.textContent=msg; toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'), 1800); }
+if(toggleBtn){ toggleBtn.addEventListener('click',()=>{
+  document.body.classList.toggle('candidate-view');
+  toggleBtn.textContent = document.body.classList.contains('candidate-view') ? '面接官ビューに戻す' : '応募者ビュー切替';
+}); }
+
+// ========= メール送信ユーティリティ =========
+const LS_KEY = 'interview_mail_prefs';
+function getMailPrefs(){
+  try{ return JSON.parse(localStorage.getItem(LS_KEY))||{}; }catch(e){ return {}; }
+}
+function saveMailPrefs(prefs){
+  localStorage.setItem(LS_KEY, JSON.stringify(prefs||{}));
+}
+function applyMailPrefs(){
+  const p=getMailPrefs();
+  if(p.to) document.getElementById('mailTo').value = p.to;
+  if(p.cc) document.getElementById('mailCc').value = p.cc;
+  if(p.bcc) document.getElementById('mailBcc').value = p.bcc;
+  if(p.subj) document.getElementById('mailSubjectTpl').value = p.subj;
+}
+// 既定値（初回のみ表示用）
+document.getElementById('mailSubjectTpl')?.setAttribute('placeholder','面談記録：{{name}}（しもごおり山の手保育園）');
+
+function buildPayload(){
+  const base = (document.querySelector('input[name="base"]:checked')||{}).value||null;
+  const band = (document.querySelector('input[name="band"]:checked')||{}).value||null;
+  const sun  = (document.querySelector('input[name="sun"]:checked')||{}).value||null;
+  const classDuty = (document.querySelector('input[name="classDuty"]:checked')||{}).value||null;
+  const exp  = (document.querySelector('input[name="exp"]:checked')||{}).value||null;
+  const f6 = document.querySelector('input[name="flex6"]').checked;
+  const fS = document.querySelector('input[name="flexShift"]').checked;
+  const fH = document.querySelector('input[name="flexHoliday"]').checked;
+
+  const chips = Array.from(document.querySelectorAll('#summary .chip')).map(n=>n.textContent);
+
+  return {
+    meta:{generatedAt:new Date().toISOString()},
+    candidate:{name:document.getElementById('candName')?.value||'', contact:document.getElementById('candContact')?.value||''},
+    interview:{at:document.getElementById('meetAt')?.value||'', interviewer:document.getElementById('interviewer')?.value||''},
+    selection:{base,band,sun,classDuty,exp,flex:{six:f6,shift:fS,holiday:fH}},
+    summary:chips,
+    notes:{
+      scriptRight:document.getElementById('scriptNotes')?.value||'',
+      hearingRight:document.getElementById('hearingNotes')?.value||'',
+      scriptInline:document.getElementById('inlineScript')?.value||'',
+      hearingInline:document.getElementById('inlineHearing')?.value||'',
+      free:document.getElementById('memoNotes')?.value||'',
+      onboard:document.getElementById('onboardNotes')?.value||''
+    }
+  };
+}
+
+function renderPreview(){
+  const p = buildPayload();
+  const pre = document.getElementById('payloadPreview');
+  if(pre){ pre.textContent = JSON.stringify(p,null,2); }
+}
+document.addEventListener('change', renderPreview);
+document.addEventListener('input', renderPreview);
+renderPreview();
+
+// 本文生成：要約 → 区切り → JSON
+function buildEmailBody(){
+  const p = buildPayload();
+  const lines = [];
+  lines.push('【面談サマリー】');
+  lines.push(`応募者：${p.candidate.name||'-'}`);
+  lines.push(`連絡先：${p.candidate.contact||'-'}`);
+  lines.push(`面談日時：${p.interview.at||'-'}`);
+  lines.push(`面接官：${p.interview.interviewer||'-'}`);
+
+  lines.push('');
+  lines.push('【選択内容】');
+  (p.summary||[]).forEach(s=>lines.push('・'+s));
+
+  const mk = (title, v)=>{ if(v && v.trim()){ lines.push(''); lines.push(`【${title}】`); lines.push(v.trim()); } };
+  mk('台本メモ（右）', p.notes.scriptRight);
+  mk('面談メモ（右）', p.notes.hearingRight);
+  mk('台本メモ（本文上）', p.notes.scriptInline);
+  mk('聞き取りメモ（本文上）', p.notes.hearingInline);
+  mk('フリーメモ', p.notes.free);
+  mk('入社時メモ', p.notes.onboard);
+
+  lines.push('');
+  lines.push('――――――――――');
+  lines.push('【JSON（システム取り込み用）】');
+  lines.push(JSON.stringify(p, null, 2));
+
+  return lines.join('\n');
+}
+
+function buildSubject(){
+  const tpl = (document.getElementById('mailSubjectTpl')?.value || '面談記録：{{name}}（しもごおり山の手保育園）');
+  const name = document.getElementById('candName')?.value || '';
+  return tpl.replaceAll('{{name}}', name);
+}
+
+function openMailto(){
+  const to = (document.getElementById('mailTo')?.value||'').trim();
+  const cc = (document.getElementById('mailCc')?.value||'').trim();
+  const bcc = (document.getElementById('mailBcc')?.value||'').trim();
+  if(!to){ alert('宛先（To）を入力してください'); return; }
+  saveMailPrefs({to, cc, bcc, subj: document.getElementById('mailSubjectTpl')?.value||''});
+  const subject = encodeURIComponent(buildSubject());
+  const body = encodeURIComponent(buildEmailBody());
+  let url = `mailto:${encodeURIComponent(to)}?subject=${subject}&body=${body}`;
+  if(cc)  url += `&cc=${encodeURIComponent(cc)}`;
+  if(bcc) url += `&bcc=${encodeURIComponent(bcc)}`;
+  location.href = url;
+}
+
+document.getElementById('copyEmailBodyBtn')?.addEventListener('click', ()=>{
+  const body = buildEmailBody();
+  navigator.clipboard.writeText(body).then(()=>toastShow('本文をコピーしました')).catch(()=>toastShow('コピーに失敗'));
+});
+
+document.getElementById('copyJsonBtn')?.addEventListener('click', ()=>{
+  const p = buildPayload();
+  navigator.clipboard.writeText(JSON.stringify(p, null, 2)).then(()=>toastShow('JSONをコピーしました')).catch(()=>toastShow('コピーに失敗'));
+});
+
+document.getElementById('downloadJsonBtn')?.addEventListener('click', ()=>{
+  const p = buildPayload();
+  const blob = new Blob([JSON.stringify(p, null, 2)], {type: 'application/json'});
+  const a = document.createElement('a');
+  const name = (document.getElementById('candName')?.value||'interview') + '_record.json';
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  URL.revokeObjectURL(a.href);
+  a.remove();
+  toastShow('JSONをダウンロードしました');
+});
+
+document.getElementById('mailtoBtn')?.addEventListener('click', openMailto);
+applyMailPrefs();
+
+// 既定宛先（保存が無い初回のみ自動セット）
+(function(){
+  const toInput = document.getElementById('mailTo');
+  if(toInput && !toInput.value){ toInput.value = 'hide@oita-yamanote.com'; }
+})();
+</script>
+</body>
+</html>
