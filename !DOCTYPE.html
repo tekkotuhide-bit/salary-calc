@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>勤怠管理システム</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Oswald:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ffffff;
+    --surface: #f6f8fa;
+    --surface2: #eaeef2;
+    --border: #d0d7de;
+    --accent: #0969da;
+    --accent2: #1a7f37;
+    --danger: #cf222e;
+    --warn: #9a6700;
+    --text: #1f2328;
+    --text-muted: #656d76;
+    --text-dim: #9198a1;
+    --radius: 12px;
+    --shadow: 0 8px 32px rgba(0,0,0,0.1);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Grid noise overlay ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 20% 0%, rgba(9,105,218,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 100%, rgba(26,127,55,0.03) 0%, transparent 60%);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* ── Layout ── */
+  .app { position: relative; z-index: 1; }
+
+  /* ── Header ── */
+  header {
+    background: rgba(246,248,250,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .logo {
+    font-family: 'Oswald', sans-serif;
+    font-size: 18px; font-weight: 600; letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+  .logo span { color: var(--text-muted); font-weight: 300; }
+  .header-time {
+    font-family: 'Oswald', sans-serif;
+    font-size: 22px; font-weight: 300;
+    color: var(--text); letter-spacing: 2px;
+  }
+  .header-date { font-size: 11px; color: var(--text-muted); text-align: right; letter-spacing: 1px; }
+
+  /* ── Main layout ── */
+  main { display: flex; gap: 0; min-height: calc(100vh - 64px); }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: 280px; min-width: 280px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 24px 0;
+    display: flex; flex-direction: column;
+  }
+  .sidebar-section-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 2px;
+    color: var(--text-dim); text-transform: uppercase;
+    padding: 0 20px 10px;
+  }
+  .staff-list { flex: 1; overflow-y: auto; padding: 0 12px; }
+  .staff-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px; border-radius: 8px;
+    cursor: pointer; transition: all 0.15s;
+    border: 1px solid transparent;
+    margin-bottom: 4px;
+  }
+  .staff-item:hover { background: var(--surface2); border-color: var(--border); }
+  .staff-item.active { background: rgba(88,166,255,0.1); border-color: rgba(88,166,255,0.3); }
+  .staff-avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; color: #fff;
+    flex-shrink: 0;
+  }
+  .staff-info { flex: 1; min-width: 0; }
+  .staff-name { font-size: 13px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .staff-role { font-size: 11px; color: var(--text-muted); }
+  .staff-status-dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  }
+  .status-in { background: var(--accent2); box-shadow: 0 0 6px rgba(63,185,80,0.6); }
+  .status-out { background: var(--text-dim); }
+  .status-late { background: var(--warn); box-shadow: 0 0 6px rgba(210,153,34,0.5); }
+
+  .sidebar-divider { height: 1px; background: var(--border); margin: 16px 12px; }
+
+  .stats-mini { padding: 0 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .stat-mini-card {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 12px; text-align: center;
+  }
+  .stat-mini-val { font-family: 'Oswald', sans-serif; font-size: 22px; font-weight: 600; }
+  .stat-mini-val.green { color: var(--accent2); }
+  .stat-mini-val.blue { color: var(--accent); }
+  .stat-mini-label { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+
+  /* ── Content area ── */
+  .content { flex: 1; padding: 32px; overflow-y: auto; }
+
+  /* ── Login card ── */
+  .login-card {
+    max-width: 420px; margin: 60px auto;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 40px;
+    box-shadow: var(--shadow);
+    animation: slideUp 0.4s ease;
+  }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .login-icon {
+    width: 60px; height: 60px; border-radius: 16px;
+    background: rgba(88,166,255,0.15); border: 1px solid rgba(88,166,255,0.3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px; margin: 0 auto 20px;
+  }
+  .login-title { font-size: 20px; font-weight: 700; text-align: center; margin-bottom: 4px; }
+  .login-subtitle { font-size: 13px; color: var(--text-muted); text-align: center; margin-bottom: 28px; }
+  .selected-staff-badge {
+    background: rgba(88,166,255,0.1); border: 1px solid rgba(88,166,255,0.3);
+    border-radius: 8px; padding: 12px 16px; margin-bottom: 20px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .badge-avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700; color: #fff; flex-shrink: 0;
+  }
+  .badge-name { font-size: 15px; font-weight: 600; }
+  .badge-role { font-size: 12px; color: var(--text-muted); }
+
+  .form-group { margin-bottom: 16px; }
+  .form-label { font-size: 12px; font-weight: 500; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; display: block; }
+  .form-input {
+    width: 100%; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 12px 16px; color: var(--text);
+    font-size: 16px; font-family: 'Noto Sans JP', sans-serif;
+    letter-spacing: 4px; outline: none; transition: border-color 0.15s;
+  }
+  .form-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(88,166,255,0.1); }
+  .form-input.error-input { border-color: var(--danger); }
+
+  .pin-dots {
+    display: flex; gap: 10px; justify-content: center; margin: 16px 0;
+  }
+  .pin-dot {
+    width: 14px; height: 14px; border-radius: 50%;
+    border: 2px solid var(--border); transition: all 0.15s;
+  }
+  .pin-dot.filled { background: var(--accent); border-color: var(--accent); }
+
+  .btn {
+    width: 100%; padding: 14px; border-radius: 8px; border: none;
+    font-size: 14px; font-weight: 700; font-family: 'Noto Sans JP', sans-serif;
+    letter-spacing: 2px; cursor: pointer; transition: all 0.15s;
+    text-transform: uppercase;
+  }
+  .btn-primary {
+    background: var(--accent); color: var(--bg);
+  }
+  .btn-primary:hover { background: #79c0ff; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(88,166,255,0.3); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-ghost {
+    background: transparent; color: var(--text-muted); border: 1px solid var(--border);
+    margin-top: 8px;
+  }
+  .btn-ghost:hover { background: var(--surface2); color: var(--text); }
+
+  .error-msg {
+    background: rgba(248,81,73,0.1); border: 1px solid rgba(248,81,73,0.3);
+    border-radius: 8px; padding: 10px 14px; color: var(--danger);
+    font-size: 13px; margin-bottom: 16px; display: none;
+  }
+  .error-msg.show { display: block; animation: shake 0.3s ease; }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+  }
+
+  /* ── Dashboard ── */
+  .dashboard { animation: slideUp 0.35s ease; }
+  .dash-header {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    margin-bottom: 28px;
+  }
+  .dash-greeting { font-size: 11px; color: var(--text-muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
+  .dash-name { font-size: 28px; font-weight: 700; }
+  .dash-dept { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+
+  .action-btns { display: flex; gap: 10px; }
+  .action-btn {
+    padding: 12px 24px; border-radius: 8px; border: none;
+    font-size: 13px; font-weight: 700; letter-spacing: 1px;
+    font-family: 'Noto Sans JP', sans-serif; cursor: pointer;
+    transition: all 0.15s; text-transform: uppercase;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .action-btn-in {
+    background: rgba(63,185,80,0.15); border: 1px solid rgba(63,185,80,0.4); color: var(--accent2);
+  }
+  .action-btn-in:hover { background: rgba(63,185,80,0.25); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(63,185,80,0.2); }
+  .action-btn-out {
+    background: rgba(248,81,73,0.12); border: 1px solid rgba(248,81,73,0.35); color: var(--danger);
+  }
+  .action-btn-out:hover { background: rgba(248,81,73,0.2); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(248,81,73,0.2); }
+  .action-btn-break {
+    background: rgba(154,103,0,0.12); border: 1px solid rgba(154,103,0,0.35); color: var(--warn);
+  }
+  .action-btn-break:hover { background: rgba(154,103,0,0.22); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(154,103,0,0.2); }
+  .action-btn-break-end {
+    background: rgba(9,105,218,0.12); border: 1px solid rgba(9,105,218,0.35); color: var(--accent);
+  }
+  .action-btn-break-end:hover { background: rgba(9,105,218,0.2); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(9,105,218,0.2); }
+  .action-btn:active { transform: translateY(0); }
+  .action-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  /* ── Status banner ── */
+  .status-banner {
+    border-radius: 10px; padding: 16px 20px;
+    display: flex; align-items: center; gap: 16px; margin-bottom: 24px;
+    border: 1px solid;
+  }
+  .status-banner.working {
+    background: rgba(63,185,80,0.08); border-color: rgba(63,185,80,0.25);
+  }
+  .status-banner.breaking {
+    background: rgba(154,103,0,0.07); border-color: rgba(154,103,0,0.28);
+  }
+  .status-banner.off {
+    background: rgba(139,148,158,0.06); border-color: var(--border);
+  }
+  .status-banner-icon { font-size: 24px; }
+  .status-banner-text { flex: 1; }
+  .status-banner-title { font-size: 14px; font-weight: 600; }
+  .status-banner-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .status-timer {
+    font-family: 'Oswald', sans-serif; font-size: 26px; font-weight: 400;
+    color: var(--accent2); letter-spacing: 2px;
+  }
+
+  /* ── Records grid ── */
+  .section-title {
+    font-size: 11px; font-weight: 700; letter-spacing: 2px;
+    color: var(--text-muted); text-transform: uppercase;
+    margin-bottom: 14px; padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .records-grid { display: grid; gap: 8px; }
+  .record-row {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 18px;
+    display: grid; grid-template-columns: 100px 1fr 1fr 80px 1fr 1fr;
+    align-items: center; gap: 12px;
+    transition: border-color 0.15s;
+  }
+  .record-row:hover { border-color: rgba(88,166,255,0.2); }
+  .record-row.today { border-color: rgba(88,166,255,0.35); background: rgba(88,166,255,0.04); }
+  .record-date { font-size: 13px; font-weight: 600; color: var(--text); }
+  .record-date-sub { font-size: 10px; color: var(--text-muted); }
+  .record-time { font-family: 'Oswald', sans-serif; font-size: 15px; font-weight: 400; letter-spacing: 1px; }
+  .record-time.in { color: var(--accent2); }
+  .record-time.out { color: var(--danger); }
+  .record-time.empty { color: var(--text-dim); font-size: 12px; }
+  .record-hours { font-size: 13px; color: var(--accent); font-weight: 500; }
+  .record-badge {
+    display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; letter-spacing: 1px;
+  }
+  .badge-present { background: rgba(63,185,80,0.12); color: var(--accent2); }
+  .badge-working { background: rgba(88,166,255,0.12); color: var(--accent); }
+  .badge-absent { background: rgba(139,148,158,0.1); color: var(--text-muted); }
+  .badge-holiday { background: rgba(210,153,34,0.12); color: var(--warn); }
+
+  .record-header-row {
+    padding: 6px 18px; display: grid;
+    grid-template-columns: 100px 1fr 1fr 80px 1fr 1fr;
+    gap: 12px; font-size: 10px; color: var(--text-dim);
+    text-transform: uppercase; letter-spacing: 1px;
+    font-weight: 700; margin-bottom: 4px;
+  }
+
+  /* ── Monthly summary cards ── */
+  .summary-cards { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 24px; }
+  .summary-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 18px 20px;
+  }
+  .summary-card-label { font-size: 11px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+  .summary-card-val {
+    font-family: 'Oswald', sans-serif; font-size: 30px; font-weight: 600;
+    line-height: 1;
+  }
+  .summary-card-val.green { color: var(--accent2); }
+  .summary-card-val.blue { color: var(--accent); }
+  .summary-card-val.warn { color: var(--warn); }
+  .summary-card-val.red { color: var(--danger); }
+  .summary-card-unit { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+
+  /* ── Admin view ── */
+  .admin-table-wrap {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden;
+  }
+  .admin-table { width: 100%; border-collapse: collapse; }
+  .admin-table th {
+    padding: 12px 18px; text-align: left;
+    font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; font-weight: 700;
+    background: var(--surface2); border-bottom: 1px solid var(--border);
+  }
+  .admin-table td { padding: 14px 18px; border-bottom: 1px solid rgba(48,54,61,0.5); font-size: 13px; }
+  .admin-table tr:last-child td { border-bottom: none; }
+  .admin-table tr:hover td { background: rgba(88,166,255,0.03); }
+  .admin-avatar-sm {
+    width: 30px; height: 30px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: #fff; margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  .tab-bar {
+    display: flex; gap: 4px; margin-bottom: 24px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 4px; width: fit-content;
+  }
+  .tab {
+    padding: 8px 20px; border-radius: 7px; border: none;
+    font-size: 13px; font-weight: 500; font-family: 'Noto Sans JP', sans-serif;
+    cursor: pointer; color: var(--text-muted); background: transparent;
+    transition: all 0.15s; letter-spacing: 0.5px;
+  }
+  .tab.active { background: var(--surface2); color: var(--text); box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+
+  .toast {
+    position: fixed; bottom: 24px; right: 24px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px 20px;
+    box-shadow: var(--shadow); font-size: 13px;
+    display: flex; align-items: center; gap: 10px; z-index: 9999;
+    transform: translateY(80px); opacity: 0; transition: all 0.3s ease;
+    max-width: 300px;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast-icon { font-size: 18px; }
+
+  .logout-btn {
+    margin: 16px 20px 0;
+    padding: 10px 16px; border-radius: 8px; border: 1px solid var(--border);
+    background: transparent; color: var(--text-muted); font-size: 12px;
+    font-family: 'Noto Sans JP', sans-serif; cursor: pointer; width: calc(100% - 40px);
+    transition: all 0.15s; text-align: left; display: flex; align-items: center; gap: 8px;
+  }
+  .logout-btn:hover { background: var(--surface2); color: var(--danger); border-color: rgba(248,81,73,0.3); }
+
+  /* ── Scrollbar ── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+
+  /* ── Responsive ── */
+  @media (max-width: 900px) {
+    .sidebar { width: 220px; min-width: 220px; }
+    .summary-cards { grid-template-columns: repeat(3, 1fr); }
+    .record-row, .record-header-row { grid-template-columns: 90px 1fr 1fr 70px 1fr; }
+    .record-row > *:nth-child(6), .record-header-row > *:nth-child(6) { display: none; }
+  }
+  @media (max-width: 680px) {
+    main { flex-direction: column; }
+    .sidebar { width: 100%; min-width: unset; border-right: none; border-bottom: 1px solid var(--border); padding: 16px 0; }
+    .content { padding: 20px 16px; }
+    .action-btns { flex-direction: column; }
+    .summary-cards { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- Header -->
+  <header>
+    <div class="logo">Attendix <span>/ 勤怠管理</span></div>
+    <div>
+      <div class="header-time" id="clockDisplay">--:--:--</div>
+      <div class="header-date" id="dateDisplay">----</div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-section-label">職員一覧</div>
+      <div class="staff-list" id="staffList"></div>
+
+      <div class="sidebar-divider"></div>
+      <div class="stats-mini">
+        <div class="stat-mini-card">
+          <div class="stat-mini-val green" id="countIn">0</div>
+          <div class="stat-mini-label">出勤中</div>
+        </div>
+        <div class="stat-mini-card">
+          <div class="stat-mini-val blue" id="countTotal">0</div>
+          <div class="stat-mini-label">総職員</div>
+        </div>
+      </div>
+      <button class="logout-btn" id="logoutBtn" style="display:none" onclick="logout()">
+        <span>⬅</span> ログアウト
+      </button>
+    </aside>
+
+    <!-- Content -->
+    <div class="content" id="mainContent">
+      <!-- default: select staff prompt -->
+      <div id="selectPrompt" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:60vh;color:var(--text-muted);">
+        <div style="font-size:48px;margin-bottom:16px;opacity:0.3">👤</div>
+        <div style="font-size:15px;font-weight:500;">左のリストから職員を選択してください</div>
+        <div style="font-size:12px;margin-top:8px;opacity:0.6;">パスワードを入力して打刻できます</div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <span class="toast-icon" id="toastIcon">✅</span>
+  <span id="toastMsg"></span>
+</div>
+
+<script>
+// ===== DATA =====
+const STAFF = [
+  { id:  1, name: "田中 花子",    role: "営業部 / 主任",     pw: "1234", color: "#0969da" },
+  { id:  2, name: "鈴木 一郎",    role: "総務部 / 係長",     pw: "5678", color: "#1a7f37" },
+  { id:  3, name: "佐藤 美咲",    role: "経理部 / 担当",     pw: "2468", color: "#9a6700" },
+  { id:  4, name: "高橋 拓也",    role: "開発部 / リーダー", pw: "1357", color: "#8250df" },
+  { id:  5, name: "伊藤 さくら",  role: "人事部 / 担当",     pw: "9999", color: "#cf222e" },
+  { id:  6, name: "渡辺 大輔",    role: "営業部 / 担当",     pw: "0000", color: "#bc4c00" },
+  { id:  7, name: "山本 健二",    role: "開発部 / 担当",     pw: "1111", color: "#0550ae" },
+  { id:  8, name: "中村 由美",    role: "総務部 / 担当",     pw: "2222", color: "#116329" },
+  { id:  9, name: "小林 直樹",    role: "経理部 / 主任",     pw: "3333", color: "#7d4e00" },
+  { id: 10, name: "加藤 絵里",    role: "人事部 / 係長",     pw: "4444", color: "#6e40c9" },
+  { id: 11, name: "吉田 浩",      role: "営業部 / 係長",     pw: "5555", color: "#a40e26" },
+  { id: 12, name: "山田 奈々",    role: "開発部 / 担当",     pw: "6666", color: "#953800" },
+  { id: 13, name: "松本 剛",      role: "総務部 / 主任",     pw: "7777", color: "#0a3069" },
+  { id: 14, name: "井上 千春",    role: "経理部 / 担当",     pw: "8888", color: "#14532d" },
+  { id: 15, name: "木村 誠",      role: "開発部 / 係長",     pw: "1122", color: "#5a2d82" },
+  { id: 16, name: "林 陽子",      role: "人事部 / 主任",     pw: "3344", color: "#82071e" },
+  { id: 17, name: "清水 修",      role: "営業部 / 担当",     pw: "5566", color: "#6f4800" },
+  { id: 18, name: "池田 真理",    role: "総務部 / 担当",     pw: "7788", color: "#032f62" },
+  { id: 19, name: "橋本 俊介",    role: "開発部 / 担当",     pw: "9900", color: "#0d4a1f" },
+  { id: 20, name: "山口 恵子",    role: "経理部 / 係長",     pw: "1213", color: "#3c1a78" },
+  { id: 21, name: "石川 大樹",    role: "営業部 / リーダー", pw: "2324", color: "#6e1c1c" },
+  { id: 22, name: "前田 裕美",    role: "人事部 / 担当",     pw: "3435", color: "#5c3500" },
+  { id: 23, name: "後藤 誠司",    role: "開発部 / 主任",     pw: "4546", color: "#0a3880" },
+  { id: 24, name: "斎藤 明子",    role: "総務部 / 係長",     pw: "5657", color: "#1b5e3b" },
+  { id: 25, name: "藤田 光",      role: "経理部 / 担当",     pw: "6768", color: "#2d1257" },
+  { id: 26, name: "近藤 美穂",    role: "営業部 / 担当",     pw: "7879", color: "#8b1a1a" },
+  { id: 27, name: "坂本 哲",      role: "開発部 / 担当",     pw: "8980", color: "#7a4400" },
+  { id: 28, name: "岡田 早苗",    role: "人事部 / 係長",     pw: "9091", color: "#1c4587" },
+  { id: 29, name: "長谷川 亮",    role: "総務部 / 担当",     pw: "0102", color: "#274e13" },
+  { id: 30, name: "村田 香織",    role: "経理部 / 主任",     pw: "1324", color: "#4a148c" },
+];
+
+const KEY = 'attendix_v2';
+let db = JSON.parse(localStorage.getItem(KEY) || '{}');
+function save() { localStorage.setItem(KEY, JSON.stringify(db)); }
+
+function todayStr() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function timeStr() {
+  const d = new Date();
+  return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+function getRecord(uid, date) {
+  if (!db[uid]) db[uid] = {};
+  if (!db[uid][date]) db[uid][date] = { in: null, out: null, breaks: [] };
+  if (!db[uid][date].breaks) db[uid][date].breaks = [];
+  return db[uid][date];
+}
+
+// 休憩時間の合計を分で返す
+function calcBreakMins(breaks) {
+  if (!breaks || breaks.length === 0) return 0;
+  let total = 0;
+  breaks.forEach(b => {
+    if (b.start && b.end) {
+      const [sh, sm] = b.start.split(':').map(Number);
+      const [eh, em] = b.end.split(':').map(Number);
+      total += (eh*60+em) - (sh*60+sm);
+    }
+  });
+  return Math.max(0, total);
+}
+
+// 休憩時間を「X時間Y分」形式で返す
+function formatBreakTime(mins) {
+  if (mins <= 0) return '--';
+  const h = Math.floor(mins/60), m = mins%60;
+  if (h === 0) return `${m}分`;
+  return m === 0 ? `${h}h` : `${h}h${m}分`;
+}
+
+function calcHours(inT, outT) {
+  if (!inT || !outT) return null;
+  const [ih, im] = inT.split(':').map(Number);
+  const [oh, om] = outT.split(':').map(Number);
+  const mins = (oh*60+om) - (ih*60+im);
+  if (mins <= 0) return null;
+  const h = Math.floor(mins/60), m = mins%60;
+  return `${h}:${String(m).padStart(2,'0')}`;
+}
+
+// 休憩差引後の実働時間（分）
+function calcNetMins(inT, outT, breaks) {
+  if (!inT || !outT) return 0;
+  const [ih, im] = inT.split(':').map(Number);
+  const [oh, om] = outT.split(':').map(Number);
+  const gross = (oh*60+om) - (ih*60+im);
+  return Math.max(0, gross - calcBreakMins(breaks));
+}
+
+function calcNetHours(inT, outT, breaks) {
+  const mins = calcNetMins(inT, outT, breaks);
+  if (mins <= 0) return null;
+  const h = Math.floor(mins/60), m = mins%60;
+  return `${h}:${String(m).padStart(2,'0')}`;
+}
+
+// ===== STATE =====
+let selectedStaff = null;
+let loggedInStaff = null;
+let clockInterval = null;
+let timerInterval = null;
+
+// ===== CLOCK =====
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clockDisplay').textContent =
+    `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+  const days = ['日','月','火','水','木','金','土'];
+  document.getElementById('dateDisplay').textContent =
+    `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日（${days[now.getDay()]}）`;
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+// ===== SIDEBAR =====
+function renderSidebar() {
+  const today = todayStr();
+  let inCount = 0;
+  let html = '';
+  STAFF.forEach(s => {
+    const rec = getRecord(s.uid || s.id, today);
+    const isIn = rec.in && !rec.out;
+    const isActive = selectedStaff && selectedStaff.id === s.id;
+    if (isIn) inCount++;
+    const initial = s.name.replace(/\s/g,'').slice(0,2);
+    html += `<div class="staff-item ${isActive?'active':''}" onclick="selectStaff(${s.id})">
+      <div class="staff-avatar" style="background:${s.color}">${initial}</div>
+      <div class="staff-info">
+        <div class="staff-name">${s.name}</div>
+        <div class="staff-role">${s.role}</div>
+      </div>
+      <div class="staff-status-dot ${isIn?'status-in':'status-out'}"></div>
+    </div>`;
+  });
+  document.getElementById('staffList').innerHTML = html;
+  document.getElementById('countIn').textContent = inCount;
+  document.getElementById('countTotal').textContent = STAFF.length;
+}
+renderSidebar();
+
+// ===== SELECT STAFF =====
+function selectStaff(id) {
+  if (loggedInStaff) { logout(true); return; }
+  selectedStaff = STAFF.find(s => s.id === id);
+  renderSidebar();
+  showLogin();
+}
+
+// ===== LOGIN =====
+function showLogin() {
+  const s = selectedStaff;
+  const initial = s.name.replace(/\s/g,'').slice(0,2);
+  document.getElementById('mainContent').innerHTML = `
+    <div class="login-card">
+      <div class="login-icon">🔑</div>
+      <div class="login-title">認証</div>
+      <div class="login-subtitle">パスワードを入力して打刻してください</div>
+      <div class="selected-staff-badge">
+        <div class="badge-avatar" style="background:${s.color}">${initial}</div>
+        <div>
+          <div class="badge-name">${s.name}</div>
+          <div class="badge-role">${s.role}</div>
+        </div>
+      </div>
+      <div class="error-msg" id="errMsg">⚠ パスワードが正しくありません</div>
+      <div class="form-group">
+        <label class="form-label">パスワード</label>
+        <input class="form-input" type="password" id="pwInput" placeholder="••••" maxlength="8"
+          oninput="updatePinDots()" onkeydown="if(event.key==='Enter')doLogin()" autocomplete="current-password">
+      </div>
+      <div class="pin-dots" id="pinDots">
+        <div class="pin-dot" id="dot0"></div>
+        <div class="pin-dot" id="dot1"></div>
+        <div class="pin-dot" id="dot2"></div>
+        <div class="pin-dot" id="dot3"></div>
+      </div>
+      <button class="btn btn-primary" onclick="doLogin()">ログイン</button>
+      <button class="btn btn-ghost" onclick="cancelLogin()">キャンセル</button>
+    </div>`;
+  setTimeout(() => { const el = document.getElementById('pwInput'); if(el) el.focus(); }, 50);
+}
+
+function updatePinDots() {
+  const val = document.getElementById('pwInput').value;
+  for (let i = 0; i < 4; i++) {
+    const dot = document.getElementById(`dot${i}`);
+    if (dot) dot.classList.toggle('filled', i < val.length);
+  }
+}
+
+function doLogin() {
+  const pw = document.getElementById('pwInput').value;
+  const err = document.getElementById('errMsg');
+  if (pw === selectedStaff.pw) {
+    err.classList.remove('show');
+    loggedInStaff = selectedStaff;
+    document.getElementById('logoutBtn').style.display = '';
+    renderSidebar();
+    showDashboard();
+  } else {
+    err.classList.add('show');
+    document.getElementById('pwInput').value = '';
+    updatePinDots();
+    document.getElementById('pwInput').classList.add('error-input');
+    setTimeout(() => document.getElementById('pwInput').classList.remove('error-input'), 600);
+  }
+}
+
+function cancelLogin() {
+  selectedStaff = null;
+  renderSidebar();
+  document.getElementById('mainContent').innerHTML = document.getElementById('selectPrompt')?.outerHTML || `
+    <div id="selectPrompt" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:60vh;color:var(--text-muted);">
+      <div style="font-size:48px;margin-bottom:16px;opacity:0.3">👤</div>
+      <div style="font-size:15px;font-weight:500;">左のリストから職員を選択してください</div>
+      <div style="font-size:12px;margin-top:8px;opacity:0.6;">パスワードを入力して打刻できます</div>
+    </div>`;
+}
+
+// ===== DASHBOARD =====
+function showDashboard(tab) {
+  tab = tab || 'today';
+  const s = loggedInStaff;
+  const today = todayStr();
+  const rec = getRecord(s.id, today);
+  const isWorking = rec.in && !rec.out;
+  const isOnBreak = isWorking && rec.breaks && rec.breaks.length > 0 && !rec.breaks[rec.breaks.length-1].end;
+  const breakMins = calcBreakMins(rec.breaks);
+  const initial = s.name.replace(/\s/g,'').slice(0,2);
+
+  // summary calc
+  const uid = s.id;
+  if (!db[uid]) db[uid] = {};
+  const allDates = Object.keys(db[uid]).sort().reverse();
+  let totalDays = 0, totalMins = 0, lateDays = 0;
+  allDates.forEach(d => {
+    const r = db[uid][d];
+    if (r.in) {
+      totalDays++;
+      if (r.in && r.out) {
+        totalMins += calcNetMins(r.in, r.out, r.breaks);
+      }
+      if (r.in > '09:00') lateDays++;
+    }
+  });
+  const totalH = Math.floor(totalMins/60);
+
+  // status banner
+  let bannerHTML = '';
+  if (isOnBreak) {
+    bannerHTML = `<div class="status-banner breaking">
+      <div class="status-banner-icon">☕</div>
+      <div class="status-banner-text">
+        <div class="status-banner-title">休憩中</div>
+        <div class="status-banner-sub">出勤時刻：${rec.in}　休憩開始：${rec.breaks[rec.breaks.length-1].start}　休憩合計：${formatBreakTime(breakMins)}</div>
+      </div>
+      <div class="status-timer" id="workTimer">--:--:--</div>
+    </div>`;
+  } else if (isWorking) {
+    bannerHTML = `<div class="status-banner working">
+      <div class="status-banner-icon">🟢</div>
+      <div class="status-banner-text">
+        <div class="status-banner-title">勤務中</div>
+        <div class="status-banner-sub">出勤時刻：${rec.in}${breakMins>0?'　休憩合計：'+formatBreakTime(breakMins):''}</div>
+      </div>
+      <div class="status-timer" id="workTimer">--:--:--</div>
+    </div>`;
+  } else if (rec.in && rec.out) {
+    bannerHTML = `<div class="status-banner off">
+      <div class="status-banner-icon">✅</div>
+      <div class="status-banner-text">
+        <div class="status-banner-title">本日の勤務完了</div>
+        <div class="status-banner-sub">出勤 ${rec.in} ／ 退勤 ${rec.out}　実働：${calcNetHours(rec.in,rec.out,rec.breaks)??'--'} h${breakMins>0?'　休憩：'+formatBreakTime(breakMins):''}</div>
+      </div>
+    </div>`;
+  } else {
+    bannerHTML = `<div class="status-banner off">
+      <div class="status-banner-icon">⏸</div>
+      <div class="status-banner-text">
+        <div class="status-banner-title">未出勤</div>
+        <div class="status-banner-sub">本日まだ打刻されていません</div>
+      </div>
+    </div>`;
+  }
+
+  // records last 10 days
+  const recent = allDates.slice(0,10);
+  let recHtml = '<div class="record-header-row"><div>日付</div><div>出勤</div><div>退勤</div><div>休憩</div><div>実働時間</div><div>状態</div></div><div class="records-grid">';
+  if (recent.length === 0) {
+    recHtml += '<div style="color:var(--text-muted);font-size:13px;padding:20px 0;text-align:center">記録がありません</div>';
+  }
+  recent.forEach(d => {
+    const r = db[uid][d];
+    const isToday = d === today;
+    const [y,m,dd] = d.split('-');
+    const dayNames = ['日','月','火','水','木','金','土'];
+    const dayName = dayNames[new Date(d).getDay()];
+    const netH = calcNetHours(r.in, r.out, r.breaks);
+    const brMins = calcBreakMins(r.breaks);
+    let badge = '';
+    if (!r.in) badge = `<span class="record-badge badge-absent">休日</span>`;
+    else if (r.in && !r.out) badge = `<span class="record-badge badge-working">勤務中</span>`;
+    else badge = `<span class="record-badge badge-present">出勤済</span>`;
+    recHtml += `<div class="record-row ${isToday?'today':''}">
+      <div><div class="record-date">${m}/${dd}</div><div class="record-date-sub">${dayName}曜日</div></div>
+      <div class="record-time in">${r.in||'--:--'}</div>
+      <div class="record-time out">${r.out||'<span class="record-time empty">未退勤</span>'}</div>
+      <div style="font-size:12px;color:var(--warn);font-weight:500;">${brMins>0?formatBreakTime(brMins):'--'}</div>
+      <div class="record-hours">${netH ? netH+' h' : '--'}</div>
+      <div>${badge}</div>
+    </div>`;
+  });
+  recHtml += '</div>';
+
+  document.getElementById('mainContent').innerHTML = `
+    <div class="dashboard">
+      <div class="dash-header">
+        <div>
+          <div class="dash-greeting">ようこそ</div>
+          <div class="dash-name">${s.name}</div>
+          <div class="dash-dept">${s.role}</div>
+        </div>
+        <div class="action-btns">
+          <button class="action-btn action-btn-in" id="btnIn" onclick="clockIn()" ${rec.in?'disabled':''}>
+            ▶ 出勤
+          </button>
+          <button class="action-btn action-btn-break" id="btnBreak" onclick="breakStart()" ${!isWorking||isOnBreak?'disabled':''}>
+            ☕ 休憩
+          </button>
+          <button class="action-btn action-btn-break-end" id="btnBreakEnd" onclick="breakEnd()" ${!isOnBreak?'disabled':''}>
+            ▶ 再開
+          </button>
+          <button class="action-btn action-btn-out" id="btnOut" onclick="clockOut()" ${!isWorking||isOnBreak?'disabled':''}>
+            ■ 退勤
+          </button>
+        </div>
+      </div>
+      ${bannerHTML}
+      <div class="summary-cards">
+        <div class="summary-card">
+          <div class="summary-card-label">出勤日数</div>
+          <div class="summary-card-val green">${totalDays}</div>
+          <div class="summary-card-unit">日</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-card-label">総実働時間</div>
+          <div class="summary-card-val blue">${totalH}</div>
+          <div class="summary-card-unit">時間</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-card-label">本日の休憩</div>
+          <div class="summary-card-val warn" style="font-size:22px;margin-top:4px;">${breakMins>0?formatBreakTime(breakMins):'--'}</div>
+          <div class="summary-card-unit">合計</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-card-label">遅刻回数</div>
+          <div class="summary-card-val ${lateDays>0?'warn':'green'}">${lateDays}</div>
+          <div class="summary-card-unit">回</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-card-label">今月の平均</div>
+          <div class="summary-card-val blue">${totalDays>0?Math.round(totalMins/totalDays/60*10)/10:0}</div>
+          <div class="summary-card-unit">h/日</div>
+        </div>
+      </div>
+      <div class="section-title">直近の打刻記録</div>
+      ${recHtml}
+    </div>`;
+
+  if (isWorking) startWorkTimer(rec.in, rec.breaks);
+}
+
+// ===== CLOCK IN / OUT =====
+function clockIn() {
+  const s = loggedInStaff;
+  const today = todayStr();
+  const rec = getRecord(s.id, today);
+  if (rec.in) return;
+  rec.in = timeStr();
+  save();
+  showToast('✅', `${s.name} さんが出勤しました（${rec.in}）`);
+  renderSidebar();
+  showDashboard();
+}
+function clockOut() {
+  const s = loggedInStaff;
+  const today = todayStr();
+  const rec = getRecord(s.id, today);
+  if (!rec.in || rec.out) return;
+  // 退勤時に休憩中なら自動終了
+  const breaks = rec.breaks;
+  if (breaks.length > 0 && !breaks[breaks.length-1].end) {
+    breaks[breaks.length-1].end = timeStr();
+  }
+  rec.out = timeStr();
+  save();
+  clearInterval(timerInterval);
+  const brMins = calcBreakMins(rec.breaks);
+  const netH = calcNetHours(rec.in, rec.out, rec.breaks);
+  showToast('🏁', `${s.name} さんが退勤しました（${rec.out}）　実働：${netH||'--'}h`);
+  renderSidebar();
+  showDashboard();
+}
+
+// ===== BREAK =====
+function breakStart() {
+  const s = loggedInStaff;
+  const today = todayStr();
+  const rec = getRecord(s.id, today);
+  if (!rec.in || rec.out) return;
+  const breaks = rec.breaks;
+  if (breaks.length > 0 && !breaks[breaks.length-1].end) return; // already on break
+  breaks.push({ start: timeStr(), end: null });
+  save();
+  clearInterval(timerInterval);
+  showToast('☕', `${s.name} さんが休憩を開始しました（${breaks[breaks.length-1].start}）`);
+  renderSidebar();
+  showDashboard();
+}
+
+function breakEnd() {
+  const s = loggedInStaff;
+  const today = todayStr();
+  const rec = getRecord(s.id, today);
+  const breaks = rec.breaks;
+  if (!breaks || breaks.length === 0) return;
+  const last = breaks[breaks.length-1];
+  if (last.end) return;
+  last.end = timeStr();
+  save();
+  const brMins = calcBreakMins(rec.breaks);
+  showToast('▶', `${s.name} さんが休憩から戻りました（休憩：${formatBreakTime(brMins)}）`);
+  renderSidebar();
+  showDashboard();
+}
+
+// ===== WORK TIMER =====
+function startWorkTimer(inTime, breaks) {
+  clearInterval(timerInterval);
+  function update() {
+    const el = document.getElementById('workTimer');
+    if (!el) { clearInterval(timerInterval); return; }
+    const now = new Date();
+    const [ih, im] = inTime.split(':').map(Number);
+    const start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), ih, im, 0);
+    let elapsed = Math.max(0, Math.floor((now - start) / 1000));
+    // 確定済みの休憩時間を差し引く
+    const completedBreakSecs = calcBreakMins(breaks) * 60;
+    // 現在進行中の休憩時間を差し引く
+    let ongoingBreakSecs = 0;
+    if (breaks && breaks.length > 0) {
+      const last = breaks[breaks.length - 1];
+      if (last.start && !last.end) {
+        const [bh, bm] = last.start.split(':').map(Number);
+        const bStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), bh, bm, 0);
+        ongoingBreakSecs = Math.max(0, Math.floor((now - bStart) / 1000));
+      }
+    }
+    let diff = Math.max(0, elapsed - completedBreakSecs - ongoingBreakSecs);
+    const h = Math.floor(diff/3600), m = Math.floor((diff%3600)/60), sec = diff%60;
+    el.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+  }
+  update();
+  timerInterval = setInterval(update, 1000);
+}
+
+// ===== LOGOUT =====
+function logout(silent) {
+  clearInterval(timerInterval);
+  if (!silent && loggedInStaff) showToast('👋', `${loggedInStaff.name} さんがログアウトしました`);
+  loggedInStaff = null;
+  selectedStaff = null;
+  document.getElementById('logoutBtn').style.display = 'none';
+  renderSidebar();
+  document.getElementById('mainContent').innerHTML = `
+    <div id="selectPrompt" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:60vh;color:var(--text-muted);">
+      <div style="font-size:48px;margin-bottom:16px;opacity:0.3">👤</div>
+      <div style="font-size:15px;font-weight:500;">左のリストから職員を選択してください</div>
+      <div style="font-size:12px;margin-top:8px;opacity:0.6;">パスワードを入力して打刻できます</div>
+    </div>`;
+}
+
+// ===== TOAST =====
+function showToast(icon, msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastIcon').textContent = icon;
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
